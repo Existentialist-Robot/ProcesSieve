@@ -4,6 +4,12 @@ version = "0.1.0"
 description = "Agile ideation and iteration and instantiation on business processes."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [
+  { name = "Marc-Antoine Parent", email = "maparent@conversence.com" },
+  { name = "Eden Redman", email = "eden@neuralberta.tech" },
+  { name = "Dave Lazar", email = "dlazar@resistorsoftware.com"},
+]
 dependencies = [
   "cohere",
   "dspy",
@@ -29,3 +35,7 @@ docs = [
 dev = [
   "ipython",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
