@@ -1,0 +1,31 @@
+[project]
+name = "processieve"
+version = "0.1.0"
+description = "Agile ideation and iteration and instantiation on business processes."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "cohere",
+  "dspy",
+  "fastapi",
+  "lightrag-hku",
+  "linkml_store",
+  "linkml",
+  "matplotlib",
+  "neo4j",
+  "networkx",
+  "py2neo",
+]
+
+[project.optional-dependencies]
+test = [
+  "asgi-lifespan",
+  "pytest-asyncio",
+  "pytest",
+]
+docs = [
+  "Sphinx",
+]
+dev = [
+  "ipython",
+]
