@@ -19,6 +19,7 @@ dependencies = [
   "linkml",
   "matplotlib",
   "neo4j",
+  "nicegui",
   "networkx",
   "py2neo",
 ]
