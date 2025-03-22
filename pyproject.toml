@@ -20,7 +20,9 @@ dependencies = [
   "matplotlib",
   "neo4j",
   "nicegui",
+  "nano_vectordb",
   "networkx",
+  "pipmaster",
   "py2neo",
 ]
 

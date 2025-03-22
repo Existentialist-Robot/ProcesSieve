@@ -1,0 +1,10 @@
+[cohere]
+apikey = ...
+chat_model = command-a-03-2025
+embed_model = embed-english-v3.0
+
+
+[neo4j]
+host = localhost
+username = neo4j
+password = neo4j
