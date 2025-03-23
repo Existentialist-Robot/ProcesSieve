@@ -112,14 +112,14 @@ async def evaluate_one(text: str, schema_id: str, schema_type:str="CaseTemplate"
     return (module.Predict(text), 1.0)
 
 
-async def evaluate_many(text: str, schema_type:str="CaseTemplate", include_draft=False) -> List[Tuple[BaseModel, float]]:
+async def evaluate_many(text: str, schema_type:str="CaseTemplate", include_draft=False) -> List[Tuple[str, BaseModel, float]]:
     # TODO: Only those connected to an org
     res = linkMlDb.find(dict(category=schema_type, status='current'))
     # TODO: Union drafts if required
     result = []
     for row in res.rows:
         (m, score) = await evaluate_one(text, row['id'], schema_type)
-        result.append[(m, score)]
-    result.sort(key=lambda x: x[1], reverse=True)
+        result.append[(m, row['id'], score)]
+    result.sort(key=lambda x: (x[2], x[1]), reverse=True)
     return result
 
