@@ -14,7 +14,7 @@ High level programs that will start on set conditions and stops/shifts on others
 
 2. Program Stand-up *high level constraints (costs/people & bandwidth) + Overview + SOPs "We just created the bones of your new Program would you like to create an instantiation of this Program?" Create a project management sheet Create a sheet that follows a standard KPI format in each case/program drive (there will only be two) - that maps directly onto the database schema - the evaluation for a given
 
-    Goal: Define high-level constraints, overview, and SOPs.
+    Goal: Define high-level constraints, overview, and SOPs, roles and responsibilities based on # of people.
     Chatbot Flow:
         Ask: "What are your constraints (e.g., budget, team bandwidth) for this program?"
         Provide a template for the program overview and SOPs.
@@ -27,7 +27,7 @@ High level programs that will start on set conditions and stops/shifts on others
 
 3. Program Instantiation Set specific KPIs (right now we have a single imutable high level)
 
-    Goal: Set specific KPIs and finalize the program structure.
+    Goal: Set specific KPIs and finalize the program structure, including a project management sheet.
     Chatbot Flow:
         Ask: "What specific KPIs would you like to track for this program?"
         Guide the user to define measurable, time-bound KPIs.
