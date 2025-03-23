@@ -72,7 +72,7 @@ classes:
       - authors
       - description
       - status
-      - schema
+      - schema_def
       - prompt
     attributes:
       process:
@@ -89,7 +89,7 @@ classes:
     slots:
       - id
       - prompt
-      - schema
+      - schema_def
 
   Process:
     slots:
@@ -157,5 +157,5 @@ slots:
    range: datetime
    required: true
   prompt:
-  schema:
+  schema_def:
     range: JSONSchema

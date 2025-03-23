@@ -1,6 +1,4 @@
-from fastapi import FastAPI
-
-from nicegui import app, ui
+from nicegui import ui
 from .main import app as fastapi_app
 
 @ui.page('/')

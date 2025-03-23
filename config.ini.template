@@ -8,3 +8,4 @@ embed_model = embed-english-v3.0
 host = localhost
 username = neo4j
 password = neo4j
+database = neo4j

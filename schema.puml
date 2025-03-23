@@ -24,7 +24,7 @@ class "CaseTemplate" [[{None}]] {
     {field} name : string  
     {field} description : string  
     {field} status : Status  
-    {field} schema : JSONSchema  
+    {field} schema_def : JSONSchema  
     {field} prompt : string  
 }
 "Process" --> "0..1" "Process" : "follows_process"
@@ -43,7 +43,7 @@ class "Narrative" [[{None}]] {
 class "OutcomeTemplate" [[{None}]] {
     {field} id : curie  
     {field} prompt : string  
-    {field} schema : JSONSchema  
+    {field} schema_def : JSONSchema  
 }
 "CaseTemplate" --> "0..1" "OutcomeTemplate" : "expected_outcome"
 class "Organization" [[{None}]] {

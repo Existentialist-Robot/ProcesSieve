@@ -197,7 +197,7 @@ class CaseTemplate(ConfiguredBaseModel):
     status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
          'domain_of': ['CaseTemplate', 'Process', 'Narrative'],
          'ifabsent': 'Status(draft)'} })
-    schema: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
+    schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
     process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'process', 'domain_of': ['CaseTemplate']} })
     addresses: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'addresses', 'domain_of': ['CaseTemplate']} })
@@ -219,7 +219,7 @@ class OutcomeTemplate(ConfiguredBaseModel):
                        'Narrative',
                        'Criterion']} })
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
-    schema: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
+    schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
 
 
 class Process(ConfiguredBaseModel):
