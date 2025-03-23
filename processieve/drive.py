@@ -1,59 +1,171 @@
+# drive.py
+import re
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from urllib.parse import urlparse, parse_qs
 
-# ----------- CONFIGURATION -----------
-SERVICE_ACCOUNT_FILE = '../service-account.json'  # 👈 Replace this with your actual path
-SCOPES = [
-    'https://www.googleapis.com/auth/documents',
-    'https://www.googleapis.com/auth/drive'
-]
-DOCUMENT_TITLE = 'My Programmatically Created Document'
-TEXT_TO_INSERT = 'Hello world! This text was added via the Google Docs API using Python 🚀'
-SHARE_WITH_EMAIL = 'eden@neuralberta.tech'  # 👈 Optional: Replace or remove if not needed
-# --------------------------------------
+class GoogleDriveHandler:
+    def __init__(self, service_account_file, scopes):
+        self.service_account_file = service_account_file
+        self.scopes = scopes
+        self._authenticate()
 
-# Authenticate with Google Docs & Drive APIs
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
-)
-docs_service = build('docs', 'v1', credentials=credentials)
-drive_service = build('drive', 'v3', credentials=credentials)
+    def _authenticate(self):
+        self.credentials = service_account.Credentials.from_service_account_file(
+            self.service_account_file, scopes=self.scopes
+        )
+        self.drive_service = build('drive', 'v3', credentials=self.credentials)
+        self.docs_service = build('docs', 'v1', credentials=self.credentials)
+        self.sheets_service = build('sheets', 'v4', credentials=self.credentials)
 
-# Step 1: Create a new Google Doc
-doc = docs_service.documents().create(body={'title': DOCUMENT_TITLE}).execute()
-doc_id = doc.get('documentId')
-print(f'✅ Document created: {DOCUMENT_TITLE} (ID: {doc_id})')
+    def set_folder_from_url(self, folder_url: str):
+        """Extract folder ID from shared Google Drive folder URL."""
+        folder_id_match = re.search(r"/folders/([a-zA-Z0-9_-]+)", folder_url)
+        if folder_id_match:
+            self.folder_id = folder_id_match.group(1)
+            print(f"✅ Folder ID extracted (regex): {self.folder_id}")
+            return
 
-# Step 2: Insert content into the document
-insert_text_request = [
-    {
-        'insertText': {
-            'location': {'index': 1},
-            'text': TEXT_TO_INSERT
+        parsed_url = urlparse(folder_url)
+        query_params = parse_qs(parsed_url.query)
+        folder_id = query_params.get('id', [None])[0]
+        if folder_id:
+            self.folder_id = folder_id
+            print(f"✅ Folder ID extracted (query param): {self.folder_id}")
+            return
+
+        raise ValueError("Invalid Google Drive folder URL. Ensure it is a shared folder link.")
+
+    def create_document(self, title: str, text: str, share_email: str = None):
+        """Create a Google Doc in the specified folder and insert text."""
+        if not hasattr(self, 'folder_id'):
+            raise ValueError("Folder ID not set. Call set_folder_from_url first.")
+
+        print(f"Using folder ID: {self.folder_id}")  # Debug log
+        file_metadata = {
+            'name': title,
+            'parents': [self.folder_id],
+            'mimeType': 'application/vnd.google-apps.document'
         }
-    }
-]
 
-docs_service.documents().batchUpdate(
-    documentId=doc_id,
-    body={'requests': insert_text_request}
-).execute()
-print(f'✍️ Text inserted into the document.')
+        print(file_metadata)
 
-# Step 3: (Optional) Share the document with someone
-if SHARE_WITH_EMAIL:
-    permission = {
-        'type': 'user',
-        'role': 'writer',  # 'reader' or 'writer'
-        'emailAddress': SHARE_WITH_EMAIL
-    }
+        try:
+            doc = self.drive_service.files().create(body=file_metadata).execute()
+            doc_id = doc.get('id')
+            print(f'✅ Document created: {title} (ID: {doc_id})')
+        except HttpError as e:
+            print(f'❌ Error creating document: {e}')
+            raise
 
-    drive_service.permissions().create(
-        fileId=doc_id,
-        body=permission,
-        fields='id'
-    ).execute()
-    print(f'📤 Document shared with: {SHARE_WITH_EMAIL}')
+        try:
+            insert_text_request = {
+                'requests': [
+                    {
+                        'insertText': {
+                            'location': {'index': 1},
+                            'text': text
+                        }
+                    }
+                ]
+            }
+            self.docs_service.documents().batchUpdate(
+                documentId=doc_id,
+                body=insert_text_request
+            ).execute()
+            print(f'✍️ Text inserted into the document.')
+        except HttpError as e:
+            print(f'❌ Error inserting text into document: {e}')
+            raise
 
-# Step 4: Print the document URL
-print(f'📄 Document URL: https://docs.google.com/document/d/{doc_id}/edit')
+        if share_email:
+            try:
+                self._share_file(doc_id, share_email)
+            except HttpError as e:
+                print(f'❌ Error sharing document: {e}')
+                raise
+
+        return f'https://docs.google.com/document/d/{doc_id}/edit'
+
+    def create_spreadsheet(self, title: str, data: list, share_email: str = None):
+        """Create a Google Sheet in the specified folder and populate with data."""
+        if not hasattr(self, 'folder_id'):
+            raise ValueError("Folder ID not set. Call set_folder_from_url first.")
+
+        print(f"Using folder ID: {self.folder_id}")  # Debug log
+        spreadsheet = {
+            'properties': {
+                'title': title,
+                'parents': [{'id': self.folder_id}]
+            },
+            'sheets': [{'properties': {'sheetType': 'GRID', 'title': 'Sheet1'}}]
+        }
+
+        try:
+            spreadsheet = self.sheets_service.spreadsheets().create(body=spreadsheet).execute()
+            spreadsheet_id = spreadsheet.get('spreadsheetId')
+            print(f'✅ Spreadsheet created: {title} (ID: {spreadsheet_id})')
+        except HttpError as e:
+            print(f'❌ Error creating spreadsheet: {e}')
+            raise
+
+        if data:
+            try:
+                self.sheets_service.spreadsheets().values().update(
+                    spreadsheetId=spreadsheet_id,
+                    range='Sheet1!A1',
+                    valueInputOption='RAW',
+                    body={'values': data}
+                ).execute()
+                print(f'✍️ Data inserted into the spreadsheet.')
+            except HttpError as e:
+                print(f'❌ Error inserting data into spreadsheet: {e}')
+                raise
+
+        if share_email:
+            try:
+                self._share_file(spreadsheet_id, share_email)
+            except HttpError as e:
+                print(f'❌ Error sharing spreadsheet: {e}')
+                raise
+
+        return f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/edit'
+
+    def check_folder_access(self):
+        """Check if the folder is accessible by listing its contents."""
+        try:
+            files = self.drive_service.files().list(
+                q=f"'{self.folder_id}' in parents and trashed = false",
+                spaces='drive',
+                fields='files(id, name, permissions)',
+                pageSize=10
+            ).execute()
+            print(f"✅ Folder accessible. Files in folder: {files.get('files', [])}")
+
+            for file in files.get('files', []):
+                permissions = file.get('permissions', [])
+                has_access = any(perm['emailAddress'] == self.service_account_email for perm in permissions)
+                print(f"File: {file['name']}, Service Account has access: {has_access}")
+
+        except HttpError as e:
+            print(f'❌ Error accessing folder: {e}')
+            raise
+
+    def _share_file(self, file_id: str, email: str):
+        """Share a file with the specified email address."""
+        permission = {
+            'type': 'user',
+            'role': 'writer',
+            'emailAddress': email
+        }
+        try:
+            self.drive_service.permissions().create(
+                fileId=file_id,
+                body=permission,
+                fields='id'
+            ).execute()
+            print(f'📤 File shared with: {email}')
+        except HttpError as e:
+            print(f'❌ Error sharing file: {e}')
+            raise
