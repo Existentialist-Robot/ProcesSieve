@@ -28,12 +28,10 @@ def clean(m: Union[Dict, List[Dict]]) -> Union[Dict, List[Dict]]:
         m.pop('category')
     return m
 
-
 @api_router.get('/organization')
 def get_organizations() -> List[Organization]:
     res = linkMlDb.find({"category": "Organization"})
     return clean(res.rows)
-
 
 @api_router.get('/organization/{id}')
 def get_organization(id: str) -> Organization:
@@ -41,8 +39,6 @@ def get_organization(id: str) -> Organization:
     if not res.num_rows:
         raise NotFound()
     return clean(res.rows[0])
-
-
 
 @api_router.post('/organization')
 def add_organization(org: Organization) -> Organization:

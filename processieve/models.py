@@ -27,10 +27,8 @@ from pydantic import (
     field_validator
 )
 
-
 metamodel_version = "None"
 version = "None"
-
 
 class ConfiguredBaseModel(BaseModel):
     model_config = ConfigDict(
@@ -42,9 +40,6 @@ class ConfiguredBaseModel(BaseModel):
         strict = False,
     )
     pass
-
-
-
 
 class LinkMLMeta(RootModel):
     root: Dict[str, Any] = {}
@@ -61,7 +56,6 @@ class LinkMLMeta(RootModel):
 
     def __contains__(self, key:str) -> bool:
         return key in self.root
-
 
 linkml_meta = LinkMLMeta({'default_prefix': 'prs',
      'default_range': 'string',
@@ -89,8 +83,6 @@ class Status(str, Enum):
     current = "current"
     superseded = "superseded"
 
-
-
 class Person(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
@@ -113,7 +105,6 @@ class Person(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     email: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'email', 'domain_of': ['Person']} })
-
 
 class Organization(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
@@ -140,7 +131,6 @@ class Organization(ConfiguredBaseModel):
     subunits: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subunits', 'domain_of': ['Organization']} })
     cases: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'cases', 'domain_of': ['Organization']} })
     case_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'case_templates', 'domain_of': ['Organization']} })
-
 
 class Case(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
@@ -171,7 +161,6 @@ class Case(ConfiguredBaseModel):
     outcome: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case']} })
     outcome_analysis: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome_analysis', 'domain_of': ['Case']} })
     evaluations: Optional[List[Evaluation]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evaluations', 'domain_of': ['Case']} })
-
 
 class CaseTemplate(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
@@ -207,7 +196,6 @@ class CaseTemplate(ConfiguredBaseModel):
     expected_outcome: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'expected_outcome', 'domain_of': ['CaseTemplate']} })
     superseded_by: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'superseded_by', 'domain_of': ['CaseTemplate']} })
 
-
 class OutcomeTemplate(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
@@ -223,7 +211,6 @@ class OutcomeTemplate(ConfiguredBaseModel):
                        'Criterion']} })
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
     schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
-
 
 class Process(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
@@ -256,7 +243,6 @@ class Process(ConfiguredBaseModel):
     subprocesses: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subprocesses', 'domain_of': ['Process']} })
     follows_process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'follows_process', 'domain_of': ['Process']} })
 
-
 class Role(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
@@ -281,7 +267,6 @@ class Role(ConfiguredBaseModel):
     description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
          'domain_of': ['CaseTemplate', 'Process', 'Role', 'Criterion']} })
 
-
 class Narrative(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
@@ -302,7 +287,6 @@ class Narrative(ConfiguredBaseModel):
     when: datetime  = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'when', 'domain_of': ['Narrative']} })
     title: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'title', 'domain_of': ['Narrative']} })
     content: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'content', 'domain_of': ['Narrative']} })
-
 
 class Criterion(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
@@ -328,13 +312,11 @@ class Criterion(ConfiguredBaseModel):
     description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
          'domain_of': ['CaseTemplate', 'Process', 'Role', 'Criterion']} })
 
-
 class Evaluation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
     criterion: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'criterion', 'domain_of': ['Evaluation']} })
     value: Optional[float] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'value', 'domain_of': ['Evaluation']} })
-
 
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
