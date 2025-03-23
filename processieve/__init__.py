@@ -49,7 +49,7 @@ cohere_client = OpenAI(
 
 nconf = config['neo4j']
 
-linkMlStore = LinkMlClient().attach_database(f'neo4j://{nconf.get('username')}:{nconf.get('password')}@{nconf.get('host')}', alias='neo4j')
+linkMlStore = LinkMlClient().attach_database(f'neo4j://{nconf.get('username')}:{nconf.get('password')}@{nconf.get('host')}/{nconf.get('database')}', alias='neo4j')
 linkMlDb = linkMlStore.get_collection(nconf.get('database', 'neo4j'))
 
 neoDriver = GraphDatabase().driver(f'neo4j://{nconf.get('host')}', auth=(nconf.get('username'), nconf.get('password')))

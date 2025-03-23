@@ -41,9 +41,11 @@ classes:
       subunits:
         range: Organization
         multivalued: true
-
       cases:
         range: Case
+        multivalued: true
+      case_templates:
+        range: CaseTemplate
         multivalued: true
   Case:
     slots:
@@ -51,6 +53,11 @@ classes:
       - name
       - narratives
     attributes:
+      selected_template:
+        range: CaseTemplate
+      considered_templates:
+        range: CaseTemplate
+        multivalued: true
       brief:
         range: Narrative
         multivalued: true
@@ -138,7 +145,7 @@ classes:
 
 slots:
   id:
-    range: curie
+    range: ncname
     identifier: true
     required: true
   name:

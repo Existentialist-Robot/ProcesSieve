@@ -139,6 +139,7 @@ class Organization(ConfiguredBaseModel):
     base_narrative: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'base_narrative', 'domain_of': ['Organization']} })
     subunits: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subunits', 'domain_of': ['Organization']} })
     cases: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'cases', 'domain_of': ['Organization']} })
+    case_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'case_templates', 'domain_of': ['Organization']} })
 
 
 class Case(ConfiguredBaseModel):
@@ -163,6 +164,8 @@ class Case(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     narratives: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'narratives', 'domain_of': ['Case']} })
+    selected_template: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'selected_template', 'domain_of': ['Case']} })
+    considered_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_templates', 'domain_of': ['Case']} })
     brief: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'brief', 'domain_of': ['Case']} })
     reports: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'reports', 'domain_of': ['Case']} })
     outcome: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case']} })
