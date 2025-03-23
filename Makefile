@@ -8,3 +8,6 @@ schema.puml: schema.yaml
 
 schema.svg: schema.puml
 	plantuml -tsvg schema.puml
+
+lint:
+	linkml-lint --validate schema.yaml
