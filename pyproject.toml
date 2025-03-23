@@ -3,7 +3,7 @@ name = "processieve"
 version = "0.1.0"
 description = "Agile ideation and iteration and instantiation on business processes."
 readme = "README.md"
-requires-python = "==3.12"
+requires-python = ">=3.12.0,<3.13"
 license = "Apache-2.0"
 authors = [
   { name = "Marc-Antoine Parent", email = "maparent@conversence.com" },
@@ -25,7 +25,7 @@ dependencies = [
   "pipmaster",
   "py2neo",
   "google-api-python-client",
-  "google-auth", 
+  "google-auth",
   "google-auth-httplib2",
   "google-auth-oauthlib"
 ]
