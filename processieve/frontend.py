@@ -8,7 +8,12 @@ from .state import AppState
 state = AppState(
     # Get the absolute path to the service-account.json file
     service_account_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'service-account.json')),
-    scopes=['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets']
+    scopes=[
+        'https://www.googleapis.com/auth/documents', 
+        'https://www.googleapis.com/auth/drive', 
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/spreadsheets'
+    ]
 )
 
 @ui.page('/')
