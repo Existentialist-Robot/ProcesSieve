@@ -1,0 +1,76 @@
+@startuml
+skinparam nodesep 10
+hide circle
+hide empty members
+class "Process" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} description : string  
+    {field} status : Status  
+}
+class "Role" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} description : string  
+}
+"Process" --> "0..*" "Role" : "roles"
+class "Person" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} email : string  
+}
+class "CaseTemplate" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} description : string  
+    {field} status : Status  
+    {field} schema : JSONSchema  
+    {field} prompt : string  
+}
+"Process" --> "0..1" "Process" : "follows_process"
+"Process" --> "0..*" "Process" : "subprocesses"
+"Process" --> "0..*" "Person" : "authors"
+"CaseTemplate" --> "0..1" "Process" : "process"
+class "Narrative" [[{None}]] {
+    {field} id : curie  
+    {field} status : Status  
+    {field} when : datetime  
+    {field} title : string  
+    {field} content : string  
+}
+"CaseTemplate" --> "0..*" "Person" : "authors"
+"Narrative" --> "0..*" "Person" : "authors"
+class "OutcomeTemplate" [[{None}]] {
+    {field} id : curie  
+    {field} prompt : string  
+    {field} schema : JSONSchema  
+}
+"CaseTemplate" --> "0..1" "OutcomeTemplate" : "expected_outcome"
+class "Organization" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+}
+class "Case" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} outcome_analysis : JSON  
+}
+"Organization" --> "0..*" "Case" : "cases"
+"Organization" --> "0..*" "Organization" : "subunits"
+"Organization" --> "0..1" "Narrative" : "base_narrative"
+"Case" --> "0..*" "Narrative" : "brief"
+"Case" --> "0..*" "Narrative" : "outcome"
+"Case" --> "0..*" "Narrative" : "reports"
+"Case" --> "0..*" "Narrative" : "narratives"
+class "Evaluation" [[{None}]] {
+    {field} value : float  
+}
+class "Criterion" [[{None}]] {
+    {field} id : curie  
+    {field} name : string  
+    {field} description : string  
+}
+"Evaluation" --> "0..1" "Criterion" : "criterion"
+"Case" *--> "0..*" "Evaluation" : "evaluations"
+"CaseTemplate" --> "0..1" "CaseTemplate" : "superseded_by"
+@enduml

@@ -1,0 +1,158 @@
+id: https://processieve.com/schemas/v0#
+name: processieve
+prefixes:
+  linkml: https://w3id.org/linkml/
+  prs: https://processieve.com/schemas/v0#
+
+default_prefix: prs
+default_range: string
+imports:
+  - linkml:types
+enums:
+  Status:
+    permissible_values:
+      draft:
+      current:
+      superseded:
+types:
+  JSON:
+    uri: xsd:string
+    base: str
+    description: JSON data
+  JSONSchema:
+    uri: xsd:string
+    base: str
+    description: A Json schema
+classes:
+  Person:
+    slots:
+      - id
+      - name
+    attributes:
+      email:
+        required: true
+  Organization:
+    slots:
+      - id
+      - name
+    attributes:
+      base_narrative:
+        range: Narrative
+      subunits:
+        range: Organization
+        multivalued: true
+
+      cases:
+        range: Case
+        multivalued: true
+  Case:
+    slots:
+      - id
+      - name
+      - narratives
+    attributes:
+      brief:
+        range: Narrative
+        multivalued: true
+      reports:
+        range: Narrative
+        multivalued: true
+      outcome:
+        range: Narrative
+        multivalued: true
+      outcome_analysis:
+        range: JSON
+      evaluations:
+        range: Evaluation
+        multivalued: true
+  CaseTemplate:
+    slots:
+      - id
+      - name
+      - authors
+      - description
+      - status
+      - schema
+      - prompt
+    attributes:
+      process:
+        range: Process
+      expected_outcome:
+        range: OutcomeTemplate
+      superseded_by:
+        range: CaseTemplate
+
+  OutcomeTemplate:
+    slots:
+      - id
+      - prompt
+      - schema
+
+  Process:
+    slots:
+      - id
+      - name
+      - authors
+      - description
+      - status
+    attributes:
+      roles:
+        range: Role
+        multivalued: true
+      subprocesses:
+        range: Process
+        multivalued: true
+      follows_process:
+        range: Process
+
+  Role:
+    slots:
+      - id
+      - name
+      - description
+  Narrative:
+    slots:
+      - id
+      - authors
+      - status
+      - when
+    attributes:
+      title:
+      content:
+
+  Criterion:
+    slots:
+      - id
+      - name
+      - description
+
+  Evaluation:
+    attributes:
+      criterion:
+        range: Criterion
+      value:
+        range: float
+
+slots:
+  id:
+    range: curie
+    identifier: true
+    required: true
+  name:
+    required: true
+  authors:
+    multivalued: true
+    range: Person
+  description:
+  narratives:
+   range: Narrative
+   multivalued: true
+  status:
+   range: Status
+   ifabsent: Status(draft)
+  when:
+   range: datetime
+   required: true
+  prompt:
+  schema:
+    range: JSONSchema
