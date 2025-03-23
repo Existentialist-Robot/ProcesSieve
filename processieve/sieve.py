@@ -1,4 +1,4 @@
-from types import Any, Dict, Type, Optional, List, Tuple
+from typing import Any, Dict, Type, Optional, List, Tuple
 from enum import Enum
 
 import dspy
