@@ -14,6 +14,12 @@ class NotFound(HTTPException):
     ) -> None:
         super().__init__(status.HTTP_404_NOT_FOUND, detail, headers)
 
+class BadRequest(HTTPException):
+    def __init__(
+        self, detail: Any = None, headers: Dict[str, str] | None = None
+    ) -> None:
+        super().__init__(status.HTTP_400_BAD_REQUEST , detail, headers)
+
 def dump(m: BaseModel) -> dict:
     d = m.model_dump()
     d['category'] = m.schema()['title']
@@ -46,8 +52,17 @@ def add_organization(org: Organization) -> Organization:
     linkMlDb.commit()
     return res
 
-@api_router.patch('/organization')
-def update_organization(org: Organization) -> Organization:
+@api_router.patch('/organization/{id}')
+def update_organization(id: str, org: Organization) -> Organization:
+    if id != org.id:
+        throw BadRequest("Do not change the Id")
     res = linkMlDb.update(dump(org))
     linkMlDb.commit()
     return res
+
+@api_router.delete('/organization/{id}')
+def delete_organization(id: str) -> None:
+    res = linkMlDb.find(dict(category= "Organization", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
