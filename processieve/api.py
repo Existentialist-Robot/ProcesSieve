@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from .models import *
 from .main import api_router
 from . import linkMlDb
-
+from .sieve import evaluate_many
 
 class NotFound(HTTPException):
     def __init__(
@@ -412,3 +412,32 @@ def delete_outcome_template(id: str) -> None:
         raise NotFound()
     linkMlDb.delete(res.rows[0])
 
+@api_router.post('/case/{id}/evaluate')
+async def evaluate_case(id: str) -> Case:
+    case = get_case(id)
+    narrative_ids = case.narratives
+    # TODO: Make this into a single query
+    narratives = [get_narrative(nid).description for nid in narrative_ids]
+    if case.brief:
+        brief = get_narrative(case.brief).description
+        prompt1 = f"""This is a description of a client case. First the generic brief:
+
+        {brief}
+
+        And then how it was described by various people:
+
+        {'\n\n'.join(narratives)}"""
+    else:
+        prompt1 = f"""This is a description of a client case. Here is how it was described by various people:
+
+        {'\n\n'.join(narratives)}"""
+
+    if case.selected_template:
+        case.outcome_analysis = await evaluate_one(prompt1)
+    else:
+        results = await evaluate_many(prompt1)
+        if results:
+            case.outcome_analysis = results[0]
+            case.selected_template = results[1]
+    update_case(id, case)
+    return case

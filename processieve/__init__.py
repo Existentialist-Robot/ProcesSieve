@@ -9,6 +9,7 @@ from lightrag.kg.shared_storage import initialize_pipeline_status
 from openai import OpenAI
 from lightrag.utils import EmbeddingFunc
 import numpy as np
+import dspy
 
 config = configparser.ConfigParser()
 
@@ -18,6 +19,8 @@ cohere_config = config['cohere']
 # Maybe move to config?
 chat_model = cohere_config.get("chat_model", "command-a-03-2025")
 embed_model = cohere_config.get("embed_model", "embed-english-v3.0")
+cohere_key = cohere_config.get('apikey')
+cohere_url = "https://api.cohere.ai/compatibility/v1"
 CHUNK_TOKEN_SIZE = 1024
 MAX_TOKENS = 4000
 
@@ -29,8 +32,8 @@ async def llm_model_func(
         prompt,
         system_prompt=system_prompt,
         history_messages=history_messages,
-        api_key=config.get('cohere', 'apikey'),
-        base_url="https://api.cohere.ai/compatibility/v1",
+        api_key=cohere_key,
+        base_url=cohere_url,
         **kwargs,
     )
 
@@ -38,14 +41,16 @@ async def embedding_func(texts: list[str]) -> np.ndarray:
     return await openai_embed(
         texts,
         model=embed_model,
-        api_key=config.get('cohere', 'apikey'),
-        base_url="https://api.cohere.ai/compatibility/v1",
+        api_key=cohere_key,
+        base_url=cohere_url,
     )
 
 cohere_client = OpenAI(
-    base_url="https://api.cohere.ai/compatibility/v1",
-    api_key=config.get('cohere', 'apikey'),
+    base_url=cohere_url,
+    api_key=cohere_key,
 )
+
+dspy.configure(lm=dspy.LM(chat_model, api_key=cohere_key, api_base=cohere_url))
 
 nconf = config['neo4j']
 
@@ -91,3 +96,11 @@ async def initialize_rag():
     await initialize_pipeline_status()
 
     return rag
+
+_RAG = None
+
+async def get_rag():
+    global _RAG
+    if _RAG is None:
+        _RAG = await initialize_rag()
+    return _RAG
