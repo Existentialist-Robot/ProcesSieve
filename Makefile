@@ -11,3 +11,6 @@ schema.svg: schema.puml
 
 lint:
 	linkml-lint --validate schema.yaml
+
+run:
+	uvicorn processieve.main:app

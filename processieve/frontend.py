@@ -1,8 +1,10 @@
-from nicegui import ui
+from fastapi import FastAPI
 
+from nicegui import app, ui
+from .main import app as fastapi_app
 
-def main():
-    print("Hello from ProcesSieve!")
+@ui.page('/')
+def show():
     mode = ui.dark_mode()
     with ui.header(elevated=True):
         ui.label("ProcesSieve Demo - Bagle Hacks Spring 2025")
@@ -21,8 +23,9 @@ def main():
     with ui.footer().style("background-color: #000000"):
         ui.label("Marc-Antoine, Eden, Dave")
     mode.enable()
-    ui.run()
 
-
-if __name__ in {"__main__", "__mp_main__"}:
-    main()
+ui.run_with(
+    fastapi_app,
+    mount_path='/',  # NOTE this can be omitted if you want the paths passed to @ui.page to be at the root
+    storage_secret='pick your private secret here',  # NOTE setting a secret is optional but allows for persistent storage per user
+)
