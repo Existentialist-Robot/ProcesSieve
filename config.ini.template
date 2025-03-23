@@ -1,3 +1,6 @@
+[main]
+secret = pick your private secret here
+
 [cohere]
 apikey = ...
 chat_model = command-a-03-2025

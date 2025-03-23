@@ -1,6 +1,10 @@
 # frontend.py
 import os
+import secrets
+
 from nicegui import ui
+
+from . import config
 from .main import app as fastapi_app
 from .state import AppState
 
@@ -23,7 +27,7 @@ def show():
         # Input for Google Drive folder URL
         folder_url_input = ui.input(label="Google Drive Shared Folder URL", placeholder="Enter folder URL").classes('w-full')
         set_folder_button = ui.button("Set Folder URL", on_click=lambda: on_set_folder_url(folder_url_input.value))
-        
+
         # Stage buttons
         def on_stage_change(stage: str):
             stage_index = state.stages.index(stage)
@@ -68,5 +72,5 @@ def on_set_folder_url(folder_url: str):
 ui.run_with(
     fastapi_app,
     mount_path='/',
-    storage_secret='pick your private secret here',
+    storage_secret=(config.get('main', 'secret', fallback=None) if config.has_section('main') else None) or secrets.token_urlsafe(16),
 )
