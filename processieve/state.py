@@ -1,3 +1,57 @@
+
+'''
+High level programs that will start on set conditions and stops/shifts on others
+
+1. Organization Stand-up What are you passionate about, what gaps do you see in the ecosystem
+
+    Goal: Understand user passions and ecosystem gaps.
+    Chatbot Flow:
+        Ask: "What are you passionate about? What gaps do you see in your ecosystem?"
+        Capture responses and store them as foundational data for the program.
+        Example:
+        User: "I’m passionate about sustainable agriculture, and I see a gap in education for small farmers."
+        Chatbot: "Great! Let’s build a program to address that. Next, we’ll define high-level constraints and structure."
+
+2. Program Stand-up *high level constraints (costs/people & bandwidth) + Overview + SOPs "We just created the bones of your new Program would you like to create an instantiation of this Program?" Create a project management sheet Create a sheet that follows a standard KPI format in each case/program drive (there will only be two) - that maps directly onto the database schema - the evaluation for a given
+
+    Goal: Define high-level constraints, overview, and SOPs.
+    Chatbot Flow:
+        Ask: "What are your constraints (e.g., budget, team bandwidth) for this program?"
+        Provide a template for the program overview and SOPs.
+        Prompt: "We’ve created the bones of your program. Would you like to create an instantiation?"
+        If "Yes":
+        Generate a project management sheet (e.g., Google Sheets or Airtable) with placeholders for tasks, timelines, and responsibilities.
+        Create a KPI sheet mapped to the database schema (e.g., columns for metrics, targets, and actuals).
+        Example:
+        Chatbot: "Your program overview is ready. Here’s a draft SOP. Shall we proceed to instantiation?"
+
+3. Program Instantiation Set specific KPIs (right now we have a single imutable high level)
+
+    Goal: Set specific KPIs and finalize the program structure.
+    Chatbot Flow:
+        Ask: "What specific KPIs would you like to track for this program?"
+        Guide the user to define measurable, time-bound KPIs.
+        Update the KPI sheet and database schema accordingly.
+        Example:
+        User: "I want to track the number of farmers trained and their yield increase."
+        Chatbot: "Got it! I’ve updated your KPI sheet and database schema. Ready to launch?"
+
+4. Program Eval (noticed you don't have any programs - would you like to co-create some?) Change in the constrains? Ask for eval/general feedback/specific changes to Overview/SOPs - post-event, based on:
+    Group post-mortem minutes Individual feedback from internal (admin) and external (participants) Accept any suggested changes - create an new Case Template schema and now this is what the Case now points to
+
+    Goal: Gather feedback, evaluate changes, and update the program.
+    Chatbot Flow:
+        Check if programs exist; if not, prompt: "Noticed you don’t have any programs. Would you like to co-create some?"
+        If programs exist:
+        Ask: "Have there been changes in constraints? How would you evaluate this program?"
+        Collect feedback from post-mortem minutes, internal, and external sources.
+        Prompt: "Would you like to accept suggested changes and update the Case Template schema?"
+        If "Yes":
+        Update the database schema and KPI sheet to reflect changes.
+        Example:
+        Chatbot: "Based on feedback, we’ve updated the SOPs and KPIs. Here’s the new Case Template schema."
+'''
+
 # state.py
 from .drive import GoogleDriveHandler
 from nicegui import ui
@@ -7,6 +61,12 @@ class AppState:
         self.drive_handler = GoogleDriveHandler(service_account_file, scopes)
         self.folder_url = None
         self.stages = ["Organization", "Program Stand-up", "Program Instantiation", "Program Evaluation"]
+        self.stage_prompts = [
+            "",
+            "",
+            "",
+            "",
+        ]
         self.current_stage_index = -1
         self.buttons = []
 
