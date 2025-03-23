@@ -72,5 +72,6 @@ class "Criterion" [[{None}]] {
 }
 "Evaluation" --> "0..1" "Criterion" : "criterion"
 "Case" *--> "0..*" "Evaluation" : "evaluations"
+"CaseTemplate" --> "0..*" "Criterion" : "addresses"
 "CaseTemplate" --> "0..1" "CaseTemplate" : "superseded_by"
 @enduml

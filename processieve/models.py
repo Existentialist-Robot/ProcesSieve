@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations 
 
 import re
 import sys
@@ -7,8 +7,8 @@ from datetime import (
     datetime,
     time
 )
-from decimal import Decimal
-from enum import Enum
+from decimal import Decimal 
+from enum import Enum 
 from typing import (
     Any,
     ClassVar,
@@ -200,6 +200,7 @@ class CaseTemplate(ConfiguredBaseModel):
     schema: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['CaseTemplate', 'OutcomeTemplate']} })
     process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'process', 'domain_of': ['CaseTemplate']} })
+    addresses: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'addresses', 'domain_of': ['CaseTemplate']} })
     expected_outcome: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'expected_outcome', 'domain_of': ['CaseTemplate']} })
     superseded_by: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'superseded_by', 'domain_of': ['CaseTemplate']} })
 
