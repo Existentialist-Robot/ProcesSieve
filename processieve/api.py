@@ -1,12 +1,14 @@
 from typing import List, Dict, Any, Union
 
-from pydantic import BaseModel
 from fastapi import HTTPException, status
 
-from .models import *
-from .main import api_router
 from . import linkMlDb
-from .sieve import evaluate_many
+from .models import (
+    Organization, Case, CaseTemplate, Person, Role, Narrative, Process,
+    OutcomeTemplate, Evaluation)
+from .utils import to_optional, dump, clean
+from .main import api_router
+from .sieve import evaluate_many, evaluate_one
 
 class NotFound(HTTPException):
     def __init__(
@@ -19,22 +21,6 @@ class BadRequest(HTTPException):
         self, detail: Any = None, headers: Dict[str, str] | None = None
     ) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST , detail, headers)
-
-def dump(m: BaseModel) -> dict:
-    d = m.model_dump()
-    d['category'] = m.schema()['title']
-    return d
-
-
-def clean(m: Union[Dict, List[Dict]]) -> Union[Dict, List[Dict]]:
-    if isinstance(m, list):
-        for r in m:
-            r.pop('category')
-    else:
-        m.pop('category')
-    return m
-
-
 
 @api_router.get('/organization')
 def get_organizations() -> List[Organization]:
@@ -49,16 +35,18 @@ def get_organization(id: str) -> Organization:
     return clean(res.rows[0])
 
 @api_router.post('/organization')
-def add_organization(org: Organization) -> Organization:
-    res = linkMlDb.store(dump(org))
+def add_organization(obj: Organization) -> Organization:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/organization/{id}')
-def update_organization(id: str, org: Organization) -> Organization:
-    if id != org.id:
+def update_organization(id: str, obj: to_optional(Organization)) -> Organization:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_organization(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -83,16 +71,18 @@ def get_case(id: str) -> Case:
     return clean(res.rows[0])
 
 @api_router.post('/case')
-def add_case(org: Case) -> Case:
-    res = linkMlDb.store(dump(org))
+def add_case(obj: Case) -> Case:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/case/{id}')
-def update_case(id: str, org: Case) -> Case:
-    if id != org.id:
+def update_case(id: str, obj: to_optional(Case)) -> Case:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_case(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -118,16 +108,18 @@ def get_case_template(id: str) -> CaseTemplate:
     return clean(res.rows[0])
 
 @api_router.post('/case_template')
-def add_case_template(org: CaseTemplate) -> CaseTemplate:
-    res = linkMlDb.store(dump(org))
+def add_case_template(obj: CaseTemplate) -> CaseTemplate:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/case_template/{id}')
-def update_case_template(id: str, org: CaseTemplate) -> CaseTemplate:
-    if id != org.id:
+def update_case_template(id: str, obj: to_optional(CaseTemplate)) -> CaseTemplate:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_case_template(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -152,16 +144,18 @@ def get_process(id: str) -> Process:
     return clean(res.rows[0])
 
 @api_router.post('/process')
-def add_process(org: Process) -> Process:
-    res = linkMlDb.store(dump(org))
+def add_process(obj: Process) -> Process:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/process/{id}')
-def update_process(id: str, org: Process) -> Process:
-    if id != org.id:
+def update_process(id: str, obj: to_optional(Process)) -> Process:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_process(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -187,16 +181,18 @@ def get_narrative(id: str) -> Narrative:
     return clean(res.rows[0])
 
 @api_router.post('/narrative')
-def add_narrative(org: Narrative) -> Narrative:
-    res = linkMlDb.store(dump(org))
+def add_narrative(obj: Narrative) -> Narrative:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/narrative/{id}')
-def update_narrative(id: str, org: Narrative) -> Narrative:
-    if id != org.id:
+def update_narrative(id: str, obj: to_optional(Narrative)) -> Narrative:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_narrative(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -221,16 +217,18 @@ def get_narrative(id: str) -> Narrative:
     return clean(res.rows[0])
 
 @api_router.post('/narrative')
-def add_narrative(org: Narrative) -> Narrative:
-    res = linkMlDb.store(dump(org))
+def add_narrative(obj: Narrative) -> Narrative:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/narrative/{id}')
-def update_narrative(id: str, org: Narrative) -> Narrative:
-    if id != org.id:
+def update_narrative(id: str, obj: to_optional(Narrative)) -> Narrative:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_narrative(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -256,16 +254,18 @@ def get_criterion(id: str) -> Organization:
     return clean(res.rows[0])
 
 @api_router.post('/criterion')
-def add_criterion(org: Organization) -> Organization:
-    res = linkMlDb.store(dump(org))
+def add_criterion(obj: Organization) -> Organization:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/criterion/{id}')
-def update_criterion(id: str, org: Organization) -> Organization:
-    if id != org.id:
+def update_criterion(id: str, obj: to_optional(Organization)) -> Organization:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_criterion(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -290,16 +290,18 @@ def get_evaluation(id: str) -> Evaluation:
     return clean(res.rows[0])
 
 @api_router.post('/evaluation')
-def add_evaluation(org: Evaluation) -> Evaluation:
-    res = linkMlDb.store(dump(org))
+def add_evaluation(obj: Evaluation) -> Evaluation:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/evaluation/{id}')
-def update_evaluation(id: str, org: Evaluation) -> Evaluation:
-    if id != org.id:
+def update_evaluation(id: str, obj: to_optional(Evaluation)) -> Evaluation:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_evaluation(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -324,16 +326,18 @@ def get_person(id: str) -> Person:
     return clean(res.rows[0])
 
 @api_router.post('/person')
-def add_person(org: Person) -> Person:
-    res = linkMlDb.store(dump(org))
+def add_person(obj: Person) -> Person:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/person/{id}')
-def update_person(id: str, org: Person) -> Person:
-    if id != org.id:
+def update_person(id: str, obj: to_optional(Person)) -> Person:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_person(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -358,16 +362,18 @@ def get_role(id: str) -> Role:
     return clean(res.rows[0])
 
 @api_router.post('/role')
-def add_role(org: Role) -> Role:
-    res = linkMlDb.store(dump(org))
+def add_role(obj: Role) -> Role:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/role/{id}')
-def update_role(id: str, org: Role) -> Role:
-    if id != org.id:
+def update_role(id: str, obj: to_optional(Role)) -> Role:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_role(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
@@ -392,16 +398,18 @@ def get_outcome_template(id: str) -> OutcomeTemplate:
     return clean(res.rows[0])
 
 @api_router.post('/outcome_template')
-def add_outcome_template(org: OutcomeTemplate) -> OutcomeTemplate:
-    res = linkMlDb.store(dump(org))
+def add_outcome_template(obj: OutcomeTemplate) -> OutcomeTemplate:
+    res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
 @api_router.patch('/outcome_template/{id}')
-def update_outcome_template(id: str, org: OutcomeTemplate) -> OutcomeTemplate:
-    if id != org.id:
+def update_outcome_template(id: str, obj: to_optional(OutcomeTemplate)) -> OutcomeTemplate:
+    if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = linkMlDb.update(dump(org))
+    res = get_outcome_template(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
