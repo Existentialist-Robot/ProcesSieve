@@ -44,12 +44,25 @@ classes:
       subunits:
         range: Organization
         multivalued: true
-      cases:
+      casebook:
         range: Case
         multivalued: true
       case_templates:
         description: The best practice workbook of the organization
-        range: ProgramTemplate
+        range: Rule
+        multivalued: true
+      rulebook:
+        range: Rulebook
+      considered_rules:
+        range: Rulebook
+
+  Rulebook:
+    description: A set of rules
+    slots:
+      - status
+    attributes:
+      rules:
+        range: Rule
         multivalued: true
 
   Case:
@@ -61,26 +74,30 @@ classes:
       - narratives
     attributes:
       selected_template:
-        range: ProgramTemplate
+        range: Rule
       considered_templates:
-        range: ProgramTemplate
+        range: Rule
         multivalued: true
       brief:
         range: Narrative
         multivalued: true
+        required: true
       reports:
-        range: Narrative
+        range: Report
         multivalued: true
       outcome:
-        range: Narrative
+        range: Report
         multivalued: true
       outcome_analysis:
         range: JSON
-      evaluations:
-        range: Evaluation
-        multivalued: true
 
-  ProgramTemplate:
+  Report:
+    description: A report contains a narrative and evaluations
+    slots:
+      - narrative
+      - evaluations
+
+  Rule:
     description:
       The template that describes an entry in our best practice workbook,
       consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.
@@ -90,18 +107,25 @@ classes:
       - authors
       - description
       - status
-      - schema_def
       - prompt
     attributes:
       process:
-        range: Process
-      addresses:
-        range: Criterion
-        multivalued: true
+        range: ProgramTemplate
       expected_outcome:
         range: OutcomeTemplate
       superseded_by:
-        range: ProgramTemplate
+        range: Rule
+      situation_schema:
+        range: JSONSchema
+
+  Objective:
+    attributes:
+      addresses:
+        range: Criterion
+        required: true
+      standard_of_evalution:
+      threshold:
+        range: float
 
   OutcomeTemplate:
     description:
@@ -111,8 +135,13 @@ classes:
       - id
       - prompt
       - schema_def
+    attributes:
+      objectives:
+        range: Objective
+        multivalued: true
 
-  Process:
+
+  ProgramTemplate:
     description:
       The actual process we will use to solve a given problem.
     slots:
@@ -126,10 +155,10 @@ classes:
         range: Role
         multivalued: true
       subprocesses:
-        range: Process
+        range: ProgramTemplate
         multivalued: true
       follows_process:
-        range: Process
+        range: ProgramTemplate
 
   Role:
     description:
@@ -140,7 +169,7 @@ classes:
       - description
   Narrative:
     description:
-      A narrative description of either a concrete or abstracted Case or Process. There can be many narratives.
+      A narrative description of either a concrete or abstracted Case or ProgramTemplate. There can be many narratives.
     slots:
       - id
       - authors
@@ -165,12 +194,15 @@ classes:
     description:
       The evaluation of an outcome with respect to one of the Program's Criteria
     attributes:
-      criterion:
-        range: Criterion
+      objective:
+        range: Objective
+        required: true
       value:
         range: float
-      standard_of_evaluation:
-        # Might be worth defining a new object
+        required: true
+      achieved:
+        range: boolean
+        required: true
 
 slots:
   id:
@@ -183,6 +215,12 @@ slots:
     multivalued: true
     range: Person
   description:
+  evaluations:
+   range: Evaluation
+   multivalued: true
+  narrative:
+   range: Narrative
+   required: true
   narratives:
    range: Narrative
    multivalued: true
