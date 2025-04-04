@@ -1,11 +1,13 @@
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 
 from fastapi import HTTPException, status
 
 from . import linkMlDb
 from .models import (
-    Organization, Case, ProgramTemplate, Person, Role, Narrative, Process,
-    OutcomeTemplate, Evaluation)
+    Person, Organization, Case, Report, Rule, SituationSchema,
+    Objective, OutcomeTemplate, ProgramTemplate, Role, Narrative,
+    Criterion, Evaluation,
+)
 from .utils import to_optional, dump, clean
 from .main import api_router
 from .sieve import evaluate_many, evaluate_one
@@ -131,37 +133,37 @@ def delete_program_template(id: str) -> None:
     linkMlDb.delete(res.rows[0])
 
 
-@api_router.get('/process')
-def get_processs() -> List[Process]:
-    res = linkMlDb.find({"category": "Process"})
+@api_router.get('/report')
+def get_reports() -> List[Report]:
+    res = linkMlDb.find({"category": "Report"})
     return clean(res.rows)
 
-@api_router.get('/process/{id}')
-def get_process(id: str) -> Process:
-    res = linkMlDb.find(dict(category= "Process", id=id))
+@api_router.get('/report/{id}')
+def get_report(id: str) -> Report:
+    res = linkMlDb.find(dict(category= "Report", id=id))
     if not res.num_rows:
         raise NotFound()
     return clean(res.rows[0])
 
-@api_router.post('/process')
-def add_process(obj: Process) -> Process:
+@api_router.post('/report')
+def add_report(obj: Report) -> Report:
     res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
-@api_router.patch('/process/{id}')
-def update_process(id: str, obj: to_optional(Process)) -> Process:
+@api_router.patch('/report/{id}')
+def update_report(id: str, obj: to_optional(Report)) -> Report:
     if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = get_process(id)
+    res = get_report(id)
     res.update(obj)
     res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
-@api_router.delete('/process/{id}')
-def delete_process(id: str) -> None:
-    res = linkMlDb.find(dict(category= "Process", id=id))
+@api_router.delete('/report/{id}')
+def delete_report(id: str) -> None:
+    res = linkMlDb.find(dict(category= "Report", id=id))
     if not res.num_rows:
         raise NotFound()
     linkMlDb.delete(res.rows[0])

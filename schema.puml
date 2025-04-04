@@ -2,7 +2,7 @@
 skinparam nodesep 10
 hide circle
 hide empty members
-class "SituationSchema" [[{None}]] {
+abstract "Template" [[{A schema that can be applied to a story}]] {
     {field} id : ncname  
     {field} prompt : string  
     {field} schema_def : JSONSchema  
@@ -14,13 +14,25 @@ class "Narrative" [[{A narrative description of either a concrete or abstracted 
     {field} title : string  
     {field} content : string  
 }
+class "SituationSchema" [[{None}]] {
+    {field} id(i) : ncname  
+    {field} prompt(i) : string  
+    {field} schema_def(i) : JSONSchema  
+}
+class "OutcomeTemplate" [[{A template that describes a category of outcome we expect at the end of a ProcessTemplate, and especially the criteria we intend to measure at the end of the process.}]] {
+    {field} id(i) : ncname  
+    {field} prompt(i) : string  
+    {field} schema_def(i) : JSONSchema  
+}
+"Template" --> "1" "Narrative" : "narrative"
+"Template" ^-- "SituationSchema"
+"Template" ^-- "OutcomeTemplate"
 class "Rule" [[{The template that describes an entry in our best practice workbook, consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.}]] {
     {field} id : ncname  
     {field} name : string  
     {field} description : string  
     {field} prompt : string  
 }
-"SituationSchema" --> "1" "Narrative" : "narrative"
 "Rule" --> "0..1" "SituationSchema" : "situation_schema"
 class "Rulebook" [[{A set of rules}]] {
     {field} status : Status  
@@ -33,11 +45,6 @@ class "Organization" [[{An organization where persons work}]] {
 "Rulebook" --> "0..*" "Rule" : "rules"
 "Organization" *--> "1" "Rulebook" : "considered_rules"
 "Organization" *--> "1" "Rulebook" : "rulebook"
-class "OutcomeTemplate" [[{A template that describes a category of outcome we expect at the end of a ProcessTemplate, and especially the criteria we intend to measure at the end of the process.}]] {
-    {field} id : ncname  
-    {field} prompt : string  
-    {field} schema_def : JSONSchema  
-}
 class "ProgramTemplate" [[{The actual process we will use to solve a given problem.}]] {
     {field} id : ncname  
     {field} name : string  
@@ -84,7 +91,6 @@ class "Objective" [[{None}]] {
     {field} threshold : float  
 }
 "OutcomeTemplate" *--> "0..*" "Objective" : "objectives"
-"OutcomeTemplate" --> "1" "Narrative" : "narrative"
 "Organization" --> "0..*" "Case" : "casebook"
 "Organization" --> "0..*" "Organization" : "subunits"
 "Organization" --> "0..1" "Narrative" : "base_narrative"

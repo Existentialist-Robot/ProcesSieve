@@ -120,12 +120,17 @@ classes:
         range: SituationSchema
 
 
-  SituationSchema:
+  Template:
+    description: A schema that can be applied to a story
+    abstract: true
     slots:
       - id
-      - narrative
       - prompt
       - schema_def
+      - narrative
+
+  SituationSchema:
+    is_a: Template
 
   Objective:
     attributes:
@@ -137,14 +142,10 @@ classes:
         range: float
 
   OutcomeTemplate:
+    is_a: Template
     description:
       A template that describes a category of outcome we expect at the end of a ProcessTemplate,
       and especially the criteria we intend to measure at the end of the process.
-    slots:
-      - id
-      - prompt
-      - schema_def
-      - narrative
     attributes:
       objectives:
         range: Objective

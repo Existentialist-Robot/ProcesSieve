@@ -1,15 +1,15 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Type
 
 import dspy
 from pydantic import BaseModel
 
 from . import linkMlDb
 from .utils import json_schema_to_base_model
-from .models import ProgramTemplate, OutcomeTemplate
+from .models import Template, OutcomeTemplate, SituationSchema
 
-models_by_name = dict(ProgramTemplate=ProgramTemplate, OutcomeTemplate=OutcomeTemplate)
+models_by_name: Dict[str, Type[Template]] = dict(SituationSchema=SituationSchema, OutcomeTemplate=OutcomeTemplate)
 
-_template_cache: Dict[Tuple[str, str], BaseModel] = {}
+_template_cache: Dict[Tuple[str, str], Type[Template]] = {}
 _schema_cache: Dict[Tuple[str, str], BaseModel] = {}
 _module_cache: Dict[Tuple[str, str], BaseModel] = {}
 
