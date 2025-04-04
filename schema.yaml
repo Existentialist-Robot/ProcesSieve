@@ -57,6 +57,7 @@ classes:
         required: true
 
   Rulebook:
+    # Not putting an Id yet, I expect we'll use the Id of the Organization + status
     description: A set of rules
     slots:
       - status
@@ -97,6 +98,7 @@ classes:
   Report:
     description: A report contains a narrative and evaluations
     slots:
+      - id
       - narrative
       - evaluations
 
@@ -133,6 +135,8 @@ classes:
     is_a: Template
 
   Objective:
+    slots:
+      - id
     attributes:
       addresses:
         range: Criterion
@@ -200,6 +204,7 @@ classes:
       unit:
 
   Evaluation:
+    # Not putting an Id, I expect we'll use the Id of the Objective
     description:
       The evaluation of an outcome with respect to one of the Program's Criteria
     attributes:

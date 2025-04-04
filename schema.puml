@@ -67,7 +67,7 @@ class "Role" [[{A process involves certain actors playing certain roles in the p
 }
 "ProgramTemplate" --> "0..*" "Role" : "roles"
 class "Report" [[{A report contains a narrative and evaluations}]] {
-
+    {field} id : ncname  
 }
 class "Evaluation" [[{The evaluation of an outcome with respect to one of the Program's Criteria}]] {
     {field} value : float  
@@ -75,8 +75,8 @@ class "Evaluation" [[{The evaluation of an outcome with respect to one of the Pr
 }
 "Report" *--> "0..*" "Evaluation" : "evaluations"
 "Report" --> "1" "Narrative" : "narrative"
-"Case" *--> "0..*" "Report" : "outcome"
-"Case" *--> "0..*" "Report" : "reports"
+"Case" --> "0..*" "Report" : "outcome"
+"Case" --> "0..*" "Report" : "reports"
 "ProgramTemplate" --> "0..1" "ProgramTemplate" : "follows_process"
 "ProgramTemplate" --> "0..*" "ProgramTemplate" : "subprocesses"
 "ProgramTemplate" --> "1" "Narrative" : "narrative"
@@ -87,10 +87,11 @@ class "Person" [[{A person involved in a process}]] {
 }
 "Narrative" --> "0..*" "Person" : "authors"
 class "Objective" [[{None}]] {
+    {field} id : ncname  
     {field} standard_of_evalution : string  
     {field} threshold : float  
 }
-"OutcomeTemplate" *--> "0..*" "Objective" : "objectives"
+"OutcomeTemplate" --> "0..*" "Objective" : "objectives"
 "Organization" --> "0..*" "Case" : "casebook"
 "Organization" --> "0..*" "Organization" : "subunits"
 "Organization" --> "0..1" "Narrative" : "base_narrative"
@@ -101,7 +102,7 @@ class "Criterion" [[{A description of a criterion by which outcomes will be eval
     {field} unit : string  
 }
 "Objective" --> "1" "Criterion" : "addresses"
-"Evaluation" *--> "1" "Objective" : "objective"
+"Evaluation" --> "1" "Objective" : "objective"
 "Case" --> "1..*" "Narrative" : "brief"
 "Case" --> "0..*" "Narrative" : "narratives"
 @enduml

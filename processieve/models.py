@@ -101,8 +101,10 @@ class Person(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -128,8 +130,10 @@ class Organization(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -172,8 +176,10 @@ class Case(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -191,8 +197,8 @@ class Case(ConfiguredBaseModel):
     selected_template: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'selected_template', 'domain_of': ['Case']} })
     considered_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_templates', 'domain_of': ['Case']} })
     brief: List[str] = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'brief', 'domain_of': ['Case']} })
-    reports: Optional[List[Report]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'reports', 'domain_of': ['Case']} })
-    outcome: Optional[List[Report]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case']} })
+    reports: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'reports', 'domain_of': ['Case']} })
+    outcome: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case']} })
     outcome_analysis: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome_analysis', 'domain_of': ['Case']} })
 
 
@@ -202,6 +208,18 @@ class Report(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
+         'domain_of': ['Person',
+                       'Organization',
+                       'Case',
+                       'Report',
+                       'Rule',
+                       'Template',
+                       'Objective',
+                       'ProgramTemplate',
+                       'Role',
+                       'Narrative',
+                       'Criterion']} })
     narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative', 'domain_of': ['Report', 'Template', 'ProgramTemplate']} })
     evaluations: Optional[List[Evaluation]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evaluations', 'domain_of': ['Report']} })
 
@@ -216,8 +234,10 @@ class Rule(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -248,8 +268,10 @@ class Template(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -266,8 +288,10 @@ class SituationSchema(Template):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -280,6 +304,18 @@ class SituationSchema(Template):
 class Objective(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
+         'domain_of': ['Person',
+                       'Organization',
+                       'Case',
+                       'Report',
+                       'Rule',
+                       'Template',
+                       'Objective',
+                       'ProgramTemplate',
+                       'Role',
+                       'Narrative',
+                       'Criterion']} })
     addresses: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'addresses', 'domain_of': ['Objective']} })
     standard_of_evalution: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'standard_of_evalution', 'domain_of': ['Objective']} })
     threshold: Optional[float] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'threshold', 'domain_of': ['Objective']} })
@@ -291,13 +327,15 @@ class OutcomeTemplate(Template):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
-    objectives: Optional[List[Objective]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'objectives', 'domain_of': ['OutcomeTemplate']} })
+    objectives: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'objectives', 'domain_of': ['OutcomeTemplate']} })
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -317,8 +355,10 @@ class ProgramTemplate(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -347,8 +387,10 @@ class Role(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -374,8 +416,10 @@ class Narrative(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -399,8 +443,10 @@ class Criterion(ConfiguredBaseModel):
          'domain_of': ['Person',
                        'Organization',
                        'Case',
+                       'Report',
                        'Rule',
                        'Template',
+                       'Objective',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
@@ -423,7 +469,7 @@ class Evaluation(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
-    objective: Objective = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'objective', 'domain_of': ['Evaluation']} })
+    objective: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'objective', 'domain_of': ['Evaluation']} })
     value: float = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'value', 'domain_of': ['Evaluation']} })
     achieved: bool = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'achieved', 'domain_of': ['Evaluation']} })
 
