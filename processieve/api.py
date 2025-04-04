@@ -422,6 +422,122 @@ def delete_outcome_template(id: str) -> None:
         raise NotFound()
     linkMlDb.delete(res.rows[0])
 
+
+@api_router.get('/rule')
+def get_rules() -> List[Rule]:
+    res = linkMlDb.find({"category": "Rule"})
+    return clean(res.rows)
+
+@api_router.post('/rule')
+def add_rule(obj: Rule) -> Rule:
+    res = linkMlDb.store(dump(obj))
+    linkMlDb.commit()
+    return res
+
+@api_router.patch('/rule/{id}')
+def update_rule(id: str, obj: to_optional(Rule)) -> Rule:
+    if id != getattr(obj, 'id', id):
+        raise BadRequest("Do not change the Id")
+    res = get_rule(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+@api_router.delete('/rule/{id}')
+def delete_rule(id: str) -> None:
+    res = linkMlDb.find(dict(category= "Rule", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+@api_router.get('/situation_schema')
+def get_situation_schemas() -> List[SituationSchema]:
+    res = linkMlDb.find({"category": "SituationSchema"})
+    return clean(res.rows)
+
+@api_router.post('/situation_schema')
+def add_situation_schema(obj: SituationSchema) -> SituationSchema:
+    res = linkMlDb.store(dump(obj))
+    linkMlDb.commit()
+    return res
+
+@api_router.patch('/situation_schema/{id}')
+def update_situation_schema(id: str, obj: to_optional(SituationSchema)) -> SituationSchema:
+    if id != getattr(obj, 'id', id):
+        raise BadRequest("Do not change the Id")
+    res = get_situation_schema(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+@api_router.delete('/situation_schema/{id}')
+def delete_situation_schema(id: str) -> None:
+    res = linkMlDb.find(dict(category= "SituationSchema", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+
+@api_router.get('/objective')
+def get_objectives() -> List[Objective]:
+    res = linkMlDb.find({"category": "Objective"})
+    return clean(res.rows)
+
+@api_router.post('/objective')
+def add_objective(obj: Objective) -> Objective:
+    res = linkMlDb.store(dump(obj))
+    linkMlDb.commit()
+    return res
+
+@api_router.patch('/objective/{id}')
+def update_objective(id: str, obj: to_optional(Objective)) -> Objective:
+    if id != getattr(obj, 'id', id):
+        raise BadRequest("Do not change the Id")
+    res = get_objective(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+@api_router.delete('/objective/{id}')
+def delete_objective(id: str) -> None:
+    res = linkMlDb.find(dict(category= "Objective", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+@api_router.get('/criterion')
+def get_criteria() -> List[Criterion]:
+    res = linkMlDb.find({"category": "Criterion"})
+    return clean(res.rows)
+
+@api_router.post('/criterion')
+def add_criterion(obj: Criterion) -> Criterion:
+    res = linkMlDb.store(dump(obj))
+    linkMlDb.commit()
+    return res
+
+@api_router.patch('/criterion/{id}')
+def update_criterion(id: str, obj: to_optional(Criterion)) -> Criterion:
+    if id != getattr(obj, 'id', id):
+        raise BadRequest("Do not change the Id")
+    res = get_criterion(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+@api_router.delete('/criterion/{id}')
+def delete_criterion(id: str) -> None:
+    res = linkMlDb.find(dict(category= "Criterion", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+
+
 @api_router.post('/case/{id}/evaluate')
 async def evaluate_case(id: str) -> Case:
     case = get_case(id)
