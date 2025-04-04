@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from . import linkMlDb
 from .models import (
-    Organization, Case, CaseTemplate, Person, Role, Narrative, Process,
+    Organization, Case, ProgramTemplate, Person, Role, Narrative, Process,
     OutcomeTemplate, Evaluation)
 from .utils import to_optional, dump, clean
 from .main import api_router
@@ -95,37 +95,37 @@ def delete_case(id: str) -> None:
 
 
 
-@api_router.get('/case_template')
-def get_case_templates() -> List[CaseTemplate]:
-    res = linkMlDb.find({"category": "CaseTemplate"})
+@api_router.get('/program_template')
+def get_program_templates() -> List[ProgramTemplate]:
+    res = linkMlDb.find({"category": "ProgramTemplate"})
     return clean(res.rows)
 
-@api_router.get('/case_template/{id}')
-def get_case_template(id: str) -> CaseTemplate:
-    res = linkMlDb.find(dict(category= "CaseTemplate", id=id))
+@api_router.get('/program_template/{id}')
+def get_program_template(id: str) -> ProgramTemplate:
+    res = linkMlDb.find(dict(category= "ProgramTemplate", id=id))
     if not res.num_rows:
         raise NotFound()
     return clean(res.rows[0])
 
-@api_router.post('/case_template')
-def add_case_template(obj: CaseTemplate) -> CaseTemplate:
+@api_router.post('/program_template')
+def add_program_template(obj: ProgramTemplate) -> ProgramTemplate:
     res = linkMlDb.store(dump(obj))
     linkMlDb.commit()
     return res
 
-@api_router.patch('/case_template/{id}')
-def update_case_template(id: str, obj: to_optional(CaseTemplate)) -> CaseTemplate:
+@api_router.patch('/program_template/{id}')
+def update_program_template(id: str, obj: to_optional(ProgramTemplate)) -> ProgramTemplate:
     if id != getattr(obj, 'id', id):
         raise BadRequest("Do not change the Id")
-    res = get_case_template(id)
+    res = get_program_template(id)
     res.update(obj)
     res = linkMlDb.update(obj)
     linkMlDb.commit()
     return res
 
-@api_router.delete('/case_template/{id}')
-def delete_case_template(id: str) -> None:
-    res = linkMlDb.find(dict(category= "CaseTemplate", id=id))
+@api_router.delete('/program_template/{id}')
+def delete_program_template(id: str) -> None:
+    res = linkMlDb.find(dict(category= "ProgramTemplate", id=id))
     if not res.num_rows:
         raise NotFound()
     linkMlDb.delete(res.rows[0])

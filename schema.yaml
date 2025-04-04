@@ -25,13 +25,16 @@ types:
     description: A Json schema
 classes:
   Person:
+    description: A person involved in a process
     slots:
       - id
       - name
     attributes:
       email:
         required: true
+
   Organization:
+    description: An organization where persons work
     slots:
       - id
       - name
@@ -45,18 +48,22 @@ classes:
         range: Case
         multivalued: true
       case_templates:
-        range: CaseTemplate
+        description: The best practice workbook of the organization
+        range: ProgramTemplate
         multivalued: true
+
   Case:
+    description:
+      The narrative description of an individual work unit we have solved or intend to solve.
     slots:
       - id
       - name
       - narratives
     attributes:
       selected_template:
-        range: CaseTemplate
+        range: ProgramTemplate
       considered_templates:
-        range: CaseTemplate
+        range: ProgramTemplate
         multivalued: true
       brief:
         range: Narrative
@@ -72,7 +79,11 @@ classes:
       evaluations:
         range: Evaluation
         multivalued: true
-  CaseTemplate:
+
+  ProgramTemplate:
+    description:
+      The template that describes an entry in our best practice workbook,
+      consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.
     slots:
       - id
       - name
@@ -90,15 +101,20 @@ classes:
       expected_outcome:
         range: OutcomeTemplate
       superseded_by:
-        range: CaseTemplate
+        range: ProgramTemplate
 
   OutcomeTemplate:
+    description:
+      A template that describes a category of outcome we expect at the end of a ProcessTemplate,
+      and especially the criteria we intend to measure at the end of the process.
     slots:
       - id
       - prompt
       - schema_def
 
   Process:
+    description:
+      The actual process we will use to solve a given problem.
     slots:
       - id
       - name
@@ -116,11 +132,15 @@ classes:
         range: Process
 
   Role:
+    description:
+      A process involves certain actors playing certain roles in the process. This describes the roles.
     slots:
       - id
       - name
       - description
   Narrative:
+    description:
+      A narrative description of either a concrete or abstracted Case or Process. There can be many narratives.
     slots:
       - id
       - authors
@@ -131,17 +151,26 @@ classes:
       content:
 
   Criterion:
+    description:
+      A description of a criterion by which outcomes will be evaluated.
+      E.g. A KPI is a Criterion.
     slots:
       - id
       - name
       - description
+    attributes:
+      unit:
 
   Evaluation:
+    description:
+      The evaluation of an outcome with respect to one of the Program's Criteria
     attributes:
       criterion:
         range: Criterion
       value:
         range: float
+      standard_of_evaluation:
+        # Might be worth defining a new object
 
 slots:
   id:

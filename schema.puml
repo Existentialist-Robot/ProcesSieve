@@ -2,24 +2,19 @@
 skinparam nodesep 10
 hide circle
 hide empty members
-class "Process" [[{None}]] {
+class "Process" [[{The actual process we will use to solve a given problem.}]] {
     {field} id : ncname  
     {field} name : string  
     {field} description : string  
     {field} status : Status  
 }
-class "Role" [[{None}]] {
+class "Role" [[{A process involves certain actors playing certain roles in the process. This describes the roles.}]] {
     {field} id : ncname  
     {field} name : string  
     {field} description : string  
 }
 "Process" --> "0..*" "Role" : "roles"
-class "Person" [[{None}]] {
-    {field} id : ncname  
-    {field} name : string  
-    {field} email : string  
-}
-class "CaseTemplate" [[{None}]] {
+class "ProgramTemplate" [[{The template that describes an entry in our best practice workbook, consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.}]] {
     {field} id : ncname  
     {field} name : string  
     {field} description : string  
@@ -27,35 +22,50 @@ class "CaseTemplate" [[{None}]] {
     {field} schema_def : JSONSchema  
     {field} prompt : string  
 }
+class "OutcomeTemplate" [[{A template that describes a category of outcome we expect at the end of a ProcessTemplate, and especially the criteria we intend to measure at the end of the process.}]] {
+    {field} id : ncname  
+    {field} prompt : string  
+    {field} schema_def : JSONSchema  
+}
+class "Criterion" [[{A description of a criterion by which outcomes will be evaluated. E.g. A KPI is a Criterion.}]] {
+    {field} id : ncname  
+    {field} name : string  
+    {field} description : string  
+    {field} unit : string  
+}
+class "Person" [[{A person involved in a process}]] {
+    {field} id : ncname  
+    {field} name : string  
+    {field} email : string  
+}
+class "Case" [[{The narrative description of an individual work unit we have solved or intend to solve.}]] {
+    {field} id : ncname  
+    {field} name : string  
+    {field} outcome_analysis : JSON  
+}
+class "Organization" [[{An organization where persons work}]] {
+    {field} id : ncname  
+    {field} name : string  
+}
+"ProgramTemplate" --> "0..1" "ProgramTemplate" : "superseded_by"
+"ProgramTemplate" --> "0..1" "OutcomeTemplate" : "expected_outcome"
+"ProgramTemplate" --> "0..*" "Criterion" : "addresses"
+"ProgramTemplate" --> "0..1" "Process" : "process"
+"ProgramTemplate" --> "0..*" "Person" : "authors"
+"Case" --> "0..*" "ProgramTemplate" : "considered_templates"
+"Case" --> "0..1" "ProgramTemplate" : "selected_template"
+"Organization" --> "0..*" "ProgramTemplate" : "case_templates"
 "Process" --> "0..1" "Process" : "follows_process"
 "Process" --> "0..*" "Process" : "subprocesses"
 "Process" --> "0..*" "Person" : "authors"
-"CaseTemplate" --> "0..1" "Process" : "process"
-class "Narrative" [[{None}]] {
+class "Narrative" [[{A narrative description of either a concrete or abstracted Case or Process. There can be many narratives.}]] {
     {field} id : ncname  
     {field} status : Status  
     {field} when : datetime  
     {field} title : string  
     {field} content : string  
 }
-"CaseTemplate" --> "0..*" "Person" : "authors"
 "Narrative" --> "0..*" "Person" : "authors"
-class "OutcomeTemplate" [[{None}]] {
-    {field} id : ncname  
-    {field} prompt : string  
-    {field} schema_def : JSONSchema  
-}
-"CaseTemplate" --> "0..1" "OutcomeTemplate" : "expected_outcome"
-class "Organization" [[{None}]] {
-    {field} id : ncname  
-    {field} name : string  
-}
-class "Case" [[{None}]] {
-    {field} id : ncname  
-    {field} name : string  
-    {field} outcome_analysis : JSON  
-}
-"Organization" --> "0..*" "CaseTemplate" : "case_templates"
 "Organization" --> "0..*" "Case" : "cases"
 "Organization" --> "0..*" "Organization" : "subunits"
 "Organization" --> "0..1" "Narrative" : "base_narrative"
@@ -63,18 +73,10 @@ class "Case" [[{None}]] {
 "Case" --> "0..*" "Narrative" : "outcome"
 "Case" --> "0..*" "Narrative" : "reports"
 "Case" --> "0..*" "Narrative" : "narratives"
-class "Evaluation" [[{None}]] {
+class "Evaluation" [[{The evaluation of an outcome with respect to one of the Program's Criteria}]] {
     {field} value : float  
-}
-class "Criterion" [[{None}]] {
-    {field} id : ncname  
-    {field} name : string  
-    {field} description : string  
+    {field} standard_of_evaluation : string  
 }
 "Evaluation" --> "0..1" "Criterion" : "criterion"
 "Case" *--> "0..*" "Evaluation" : "evaluations"
-"CaseTemplate" --> "0..*" "Criterion" : "addresses"
-"CaseTemplate" --> "0..1" "CaseTemplate" : "superseded_by"
-"Case" --> "0..*" "CaseTemplate" : "considered_templates"
-"Case" --> "0..1" "CaseTemplate" : "selected_template"
 @enduml

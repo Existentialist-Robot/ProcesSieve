@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 from . import linkMlDb
 from .utils import json_schema_to_base_model
-from .models import CaseTemplate, OutcomeTemplate
+from .models import ProgramTemplate, OutcomeTemplate
 
-models_by_name = dict(CaseTemplate=CaseTemplate, OutcomeTemplate=OutcomeTemplate)
+models_by_name = dict(ProgramTemplate=ProgramTemplate, OutcomeTemplate=OutcomeTemplate)
 
 _template_cache: Dict[Tuple[str, str], BaseModel] = {}
 _schema_cache: Dict[Tuple[str, str], BaseModel] = {}
@@ -46,13 +46,13 @@ def get_dspy_module(schema_id: str, schema_type: str):
     return module
 
 
-async def evaluate_one(text: str, schema_id: str, schema_type:str="CaseTemplate") -> Tuple[BaseModel, float]:
+async def evaluate_one(text: str, schema_id: str, schema_type:str="ProgramTemplate") -> Tuple[BaseModel, float]:
     module = get_dspy_module(schema_id, schema_type)
     # TODO: Add metrics
     return (module.Predict(text), 1.0)
 
 
-async def evaluate_many(text: str, schema_type:str="CaseTemplate", include_draft=False) -> List[Tuple[str, BaseModel, float]]:
+async def evaluate_many(text: str, schema_type:str="ProgramTemplate", include_draft=False) -> List[Tuple[str, BaseModel, float]]:
     # TODO: Only those connected to an org
     res = linkMlDb.find(dict(category=schema_type, status='current'))
     # TODO: Union drafts if required
