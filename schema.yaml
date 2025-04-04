@@ -39,6 +39,7 @@ classes:
       - id
       - name
     attributes:
+      mission_statetement:
       base_narrative:
         range: Narrative
       subunits:
@@ -50,8 +51,10 @@ classes:
       rulebook:
         description: The best practice workbook of the organization
         range: Rulebook
+        required: true
       considered_rules:
         range: Rulebook
+        required: true
 
   Rulebook:
     description: A set of rules
@@ -70,6 +73,9 @@ classes:
       - name
       - narratives
     attributes:
+      idealized:
+        range: boolean
+        required: true
       selected_template:
         range: Rule
       considered_templates:
@@ -101,9 +107,7 @@ classes:
     slots:
       - id
       - name
-      - authors
       - description
-      - status
       - prompt
     attributes:
       process:
@@ -113,7 +117,15 @@ classes:
       superseded_by:
         range: Rule
       situation_schema:
-        range: JSONSchema
+        range: SituationSchema
+
+
+  SituationSchema:
+    slots:
+      - id
+      - narrative
+      - prompt
+      - schema_def
 
   Objective:
     attributes:
@@ -132,6 +144,7 @@ classes:
       - id
       - prompt
       - schema_def
+      - narrative
     attributes:
       objectives:
         range: Objective
@@ -144,9 +157,7 @@ classes:
     slots:
       - id
       - name
-      - authors
-      - description
-      - status
+      - narrative
     attributes:
       roles:
         range: Role

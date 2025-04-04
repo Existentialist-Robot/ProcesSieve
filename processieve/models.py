@@ -102,6 +102,7 @@ class Person(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -129,6 +130,7 @@ class Organization(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -142,12 +144,12 @@ class Organization(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
+    mission_statetement: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'mission_statetement', 'domain_of': ['Organization']} })
     base_narrative: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'base_narrative', 'domain_of': ['Organization']} })
     subunits: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subunits', 'domain_of': ['Organization']} })
     casebook: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'casebook', 'domain_of': ['Organization']} })
-    case_templates: Optional[List[str]] = Field(default=None, description="""The best practice workbook of the organization""", json_schema_extra = { "linkml_meta": {'alias': 'case_templates', 'domain_of': ['Organization']} })
-    rulebook: Optional[Rulebook] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'rulebook', 'domain_of': ['Organization']} })
-    considered_rules: Optional[Rulebook] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_rules', 'domain_of': ['Organization']} })
+    rulebook: Rulebook = Field(default=..., description="""The best practice workbook of the organization""", json_schema_extra = { "linkml_meta": {'alias': 'rulebook', 'domain_of': ['Organization']} })
+    considered_rules: Rulebook = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'considered_rules', 'domain_of': ['Organization']} })
 
 
 class Rulebook(ConfiguredBaseModel):
@@ -157,7 +159,7 @@ class Rulebook(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
     status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
-         'domain_of': ['Rulebook', 'Rule', 'ProgramTemplate', 'Narrative'],
+         'domain_of': ['Rulebook', 'Narrative'],
          'ifabsent': 'Status(draft)'} })
     rules: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'rules', 'domain_of': ['Rulebook']} })
 
@@ -173,6 +175,7 @@ class Case(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -187,6 +190,7 @@ class Case(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     narratives: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'narratives', 'domain_of': ['Case']} })
+    idealized: bool = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'idealized', 'domain_of': ['Case']} })
     selected_template: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'selected_template', 'domain_of': ['Case']} })
     considered_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_templates', 'domain_of': ['Case']} })
     brief: List[str] = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'brief', 'domain_of': ['Case']} })
@@ -201,7 +205,11 @@ class Report(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
-    narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative', 'domain_of': ['Report']} })
+    narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative',
+         'domain_of': ['Report',
+                       'SituationSchema',
+                       'OutcomeTemplate',
+                       'ProgramTemplate']} })
     evaluations: Optional[List[Evaluation]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evaluations', 'domain_of': ['Report']} })
 
 
@@ -216,6 +224,7 @@ class Rule(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -229,17 +238,35 @@ class Rule(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
-    authors: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Rule', 'ProgramTemplate', 'Narrative']} })
-    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
-         'domain_of': ['Rule', 'ProgramTemplate', 'Role', 'Criterion']} })
-    status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
-         'domain_of': ['Rulebook', 'Rule', 'ProgramTemplate', 'Narrative'],
-         'ifabsent': 'Status(draft)'} })
-    prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'OutcomeTemplate']} })
+    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Rule', 'Role', 'Criterion']} })
+    prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'SituationSchema', 'OutcomeTemplate']} })
     process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'process', 'domain_of': ['Rule']} })
     expected_outcome: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'expected_outcome', 'domain_of': ['Rule']} })
     superseded_by: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'superseded_by', 'domain_of': ['Rule']} })
     situation_schema: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'situation_schema', 'domain_of': ['Rule']} })
+
+
+class SituationSchema(ConfiguredBaseModel):
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
+         'domain_of': ['Person',
+                       'Organization',
+                       'Case',
+                       'Rule',
+                       'SituationSchema',
+                       'OutcomeTemplate',
+                       'ProgramTemplate',
+                       'Role',
+                       'Narrative',
+                       'Criterion']} })
+    narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative',
+         'domain_of': ['Report',
+                       'SituationSchema',
+                       'OutcomeTemplate',
+                       'ProgramTemplate']} })
+    prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'SituationSchema', 'OutcomeTemplate']} })
+    schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['SituationSchema', 'OutcomeTemplate']} })
 
 
 class Objective(ConfiguredBaseModel):
@@ -261,13 +288,19 @@ class OutcomeTemplate(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
                        'Criterion']} })
-    prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'OutcomeTemplate']} })
-    schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['OutcomeTemplate']} })
+    prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'SituationSchema', 'OutcomeTemplate']} })
+    schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['SituationSchema', 'OutcomeTemplate']} })
+    narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative',
+         'domain_of': ['Report',
+                       'SituationSchema',
+                       'OutcomeTemplate',
+                       'ProgramTemplate']} })
     objectives: Optional[List[Objective]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'objectives', 'domain_of': ['OutcomeTemplate']} })
 
 
@@ -282,6 +315,7 @@ class ProgramTemplate(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -295,12 +329,11 @@ class ProgramTemplate(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
-    authors: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Rule', 'ProgramTemplate', 'Narrative']} })
-    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
-         'domain_of': ['Rule', 'ProgramTemplate', 'Role', 'Criterion']} })
-    status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
-         'domain_of': ['Rulebook', 'Rule', 'ProgramTemplate', 'Narrative'],
-         'ifabsent': 'Status(draft)'} })
+    narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative',
+         'domain_of': ['Report',
+                       'SituationSchema',
+                       'OutcomeTemplate',
+                       'ProgramTemplate']} })
     roles: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'roles', 'domain_of': ['ProgramTemplate']} })
     subprocesses: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subprocesses', 'domain_of': ['ProgramTemplate']} })
     follows_process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'follows_process', 'domain_of': ['ProgramTemplate']} })
@@ -317,6 +350,7 @@ class Role(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -330,8 +364,7 @@ class Role(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
-    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
-         'domain_of': ['Rule', 'ProgramTemplate', 'Role', 'Criterion']} })
+    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Rule', 'Role', 'Criterion']} })
 
 
 class Narrative(ConfiguredBaseModel):
@@ -345,14 +378,15 @@ class Narrative(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
                        'Narrative',
                        'Criterion']} })
-    authors: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Rule', 'ProgramTemplate', 'Narrative']} })
+    authors: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Narrative']} })
     status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
-         'domain_of': ['Rulebook', 'Rule', 'ProgramTemplate', 'Narrative'],
+         'domain_of': ['Rulebook', 'Narrative'],
          'ifabsent': 'Status(draft)'} })
     when: datetime  = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'when', 'domain_of': ['Narrative']} })
     title: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'title', 'domain_of': ['Narrative']} })
@@ -370,6 +404,7 @@ class Criterion(ConfiguredBaseModel):
                        'Organization',
                        'Case',
                        'Rule',
+                       'SituationSchema',
                        'OutcomeTemplate',
                        'ProgramTemplate',
                        'Role',
@@ -383,8 +418,7 @@ class Criterion(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
-    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description',
-         'domain_of': ['Rule', 'ProgramTemplate', 'Role', 'Criterion']} })
+    description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Rule', 'Role', 'Criterion']} })
     unit: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'unit', 'domain_of': ['Criterion']} })
 
 
@@ -407,6 +441,7 @@ Rulebook.model_rebuild()
 Case.model_rebuild()
 Report.model_rebuild()
 Rule.model_rebuild()
+SituationSchema.model_rebuild()
 Objective.model_rebuild()
 OutcomeTemplate.model_rebuild()
 ProgramTemplate.model_rebuild()
