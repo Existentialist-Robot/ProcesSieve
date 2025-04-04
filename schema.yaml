@@ -47,11 +47,8 @@ classes:
       casebook:
         range: Case
         multivalued: true
-      case_templates:
-        description: The best practice workbook of the organization
-        range: Rule
-        multivalued: true
       rulebook:
+        description: The best practice workbook of the organization
         range: Rulebook
       considered_rules:
         range: Rulebook
