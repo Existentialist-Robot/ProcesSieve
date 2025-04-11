@@ -486,6 +486,14 @@ def get_rules() -> List[Rule]:
     return clean(res.rows)
 
 
+@api_router.get("/rule/{id}")
+def get_rule(id: str) -> Rule:
+    res = linkMlDb.find(dict(category="Rule", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    return clean(res.rows[0])
+
+
 @api_router.post("/rule")
 def add_rule(obj: Rule) -> Rule:
     res = linkMlDb.store(dump(obj))
@@ -516,6 +524,14 @@ def delete_rule(id: str) -> None:
 def get_situation_schemas() -> List[SituationSchema]:
     res = linkMlDb.find({"category": "SituationSchema"})
     return clean(res.rows)
+
+
+@api_router.get("/situation_schema/{id}")
+def get_situation_schema(id: str) -> SituationSchema:
+    res = linkMlDb.find(dict(category="SituationSchema", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    return clean(res.rows[0])
 
 
 @api_router.post("/situation_schema")
@@ -550,6 +566,14 @@ def delete_situation_schema(id: str) -> None:
 def get_objectives() -> List[Objective]:
     res = linkMlDb.find({"category": "Objective"})
     return clean(res.rows)
+
+
+@api_router.get("/objective/{id}")
+def get_objective(id: str) -> Objective:
+    res = linkMlDb.find(dict(category="Objective", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    return clean(res.rows[0])
 
 
 @api_router.post("/objective")

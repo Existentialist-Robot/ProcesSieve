@@ -6,28 +6,28 @@ readme = "README.md"
 requires-python = ">=3.12.0,<3.13"
 license = "Apache-2.0"
 authors = [
-  { name = "Marc-Antoine Parent", email = "maparent@conversence.com" },
-  { name = "Eden Redman", email = "eden@neuralberta.tech" },
-  { name = "Dave Lazar", email = "dlazar@resistorsoftware.com" },
+    { name = "Marc-Antoine Parent", email = "maparent@conversence.com" },
+    { name = "Eden Redman", email = "eden@neuralberta.tech" },
+    { name = "Dave Lazar", email = "dlazar@resistorsoftware.com" },
 ]
 dependencies = [
-  "cohere",
-  "dspy",
-  "fastapi",
-  "lightrag-hku",
-  "linkml_store@git+https://github.com/maparent/linkml-store@main",
-  "linkml",
-  "matplotlib",
-  "neo4j",
-  "nicegui",
-  "nano_vectordb",
-  "networkx",
-  "pipmaster",
-  "py2neo",
-  "google-api-python-client",
-  "google-auth",
-  "google-auth-httplib2",
-  "google-auth-oauthlib"
+    "cohere",
+    "dspy<2.6",
+    "fastapi",
+    "lightrag-hku",
+    "linkml_store@git+https://github.com/maparent/linkml-store@main",
+    "linkml",
+    "matplotlib",
+    "neo4j",
+    "nicegui",
+    "nano_vectordb",
+    "networkx",
+    "pipmaster",
+    "py2neo",
+    "google-api-python-client",
+    "google-auth",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
 ]
 
 [project.optional-dependencies]
