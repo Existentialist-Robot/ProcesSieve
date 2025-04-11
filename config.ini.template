@@ -3,8 +3,8 @@ secret = pick your private secret here
 
 [cohere]
 apikey = ...
-chat_model = command-a-03-2025
-embed_model = embed-english-v3.0
+chat_model = openai/command-a-03-2025
+embed_model = openai/embed-english-v3.0
 
 
 [neo4j]
