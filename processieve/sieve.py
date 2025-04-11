@@ -1,8 +1,8 @@
-from typing import Dict, List, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type
 
 import dspy
 from orjson import loads
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from . import linkMlDb
 from .models import ReportTemplate, SituationSchema, Template
@@ -15,6 +15,12 @@ models_by_name: Dict[str, Type[Template]] = dict(
 _template_cache: Dict[Tuple[str, str], Type[Template]] = {}
 _schema_cache: Dict[Tuple[str, str], BaseModel] = {}
 _module_cache: Dict[Tuple[str, str], BaseModel] = {}
+
+
+class BaseModelWithConfidence(BaseModel):
+    confidence: float = Field(
+        ge=0, le=1, description="The confidence score for the answer"
+    )
 
 
 def get_template(schema_id: str, schema_type: str) -> BaseModel:
@@ -31,19 +37,21 @@ def get_template(schema_id: str, schema_type: str) -> BaseModel:
     return tmpl
 
 
-def get_schema(schema_id: str, schema_type: str) -> BaseModel:
+def get_schema(schema_id: str, schema_type: str) -> BaseModelWithConfidence:
     global _schema_cache
     schema = _schema_cache.get((schema_id, schema_type))
     if not schema:
         tmpl = get_template(schema_id, schema_type)
         json_schema = loads(tmpl.schema_def)
-        json_schema["properties"]["confidence"] = dict(
-            type="integer",
-            description="The confidence score for the answer",
-            minimum=0,
-            maximum=10,
+        # json_schema["properties"]["confidence"] = dict(
+        #     type="integer",
+        #     description="The confidence score for the answer",
+        #     minimum=0,
+        #     maximum=10,
+        # )
+        schema = json_schema_to_base_model(
+            json_schema, f"{schema_type}_{schema_id}", BaseModelWithConfidence
         )
-        schema = json_schema_to_base_model(json_schema, f"{schema_type}_{schema_id}")
         _schema_cache[(schema_id, schema_type)] = schema
     return schema
 
@@ -55,7 +63,7 @@ def get_dspy_module(schema_id: str, schema_type: str):
         output_schema = get_schema(schema_id, schema_type)
 
         class Signature(dspy.Signature):
-            """Answer the question based on the context and query provided, and on the scale of 10 tell how confident you are about the answer."""
+            """Answer the question based on the context and query provided, and on the scale of 0-1 tell how confident you are about the answer."""
 
             input: str = dspy.InputField()
             output: output_schema = dspy.OutputField()
@@ -67,11 +75,13 @@ def get_dspy_module(schema_id: str, schema_type: str):
 
 async def evaluate_one(
     text: str, schema_id: str, schema_type: str = "ProgramTemplate"
-) -> Tuple[BaseModel, float]:
+) -> Optional[BaseModelWithConfidence]:
     """Evaluate a single text against a schema."""
     module = get_dspy_module(schema_id, schema_type)
     # TODO: Add metrics
-    return (module(input=text), 1.0)
+    result = module(input=text)
+    if result:
+        return result.output
 
 
 async def evaluate_many(
@@ -82,7 +92,8 @@ async def evaluate_many(
     # TODO: Union drafts if required
     result = []
     for row in res.rows:
-        (m, score) = await evaluate_one(text, row["id"], schema_type)
-        result.append[(m, row["id"], score)]
+        m = await evaluate_one(text, row["id"], schema_type)
+        if m:
+            result.append[(m, row["id"], m.confidence)]
     result.sort(key=lambda x: (x[2], x[1]), reverse=True)
     return result

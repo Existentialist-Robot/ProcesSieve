@@ -1,6 +1,6 @@
-from typing import Dict, List, Tuple, Any, Optional, Type, TypeVar, Union
 from copy import deepcopy
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from pydantic import BaseModel, Field, create_model
 from pydantic.fields import FieldInfo
@@ -57,7 +57,7 @@ type_mapping: dict[str, type] = {
 
 
 def json_schema_to_base_model(
-    schema: dict[str, Any], name: Optional[str] = None
+    schema: dict[str, Any], name: Optional[str] = None, base=BaseModel
 ) -> Type[BaseModel]:
     properties = schema.get("properties", {})
     required_fields = schema.get("required", [])
@@ -105,4 +105,4 @@ def json_schema_to_base_model(
     for field_name, field_props in properties.items():
         model_fields[field_name] = process_field(field_name, field_props)
 
-    return create_model(name or schema.get("title"), **model_fields)
+    return create_model(name or schema.get("title"), **model_fields, __base__=base)

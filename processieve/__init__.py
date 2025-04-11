@@ -1,15 +1,15 @@
 import configparser
 import os
 
+import dspy
+import numpy as np
+from lightrag import LightRAG, QueryParam
+from lightrag.kg.shared_storage import initialize_pipeline_status
+from lightrag.llm.openai import openai_complete_if_cache, openai_embed
+from lightrag.utils import EmbeddingFunc
 from linkml_store import Client as LinkMlClient
 from neo4j import GraphDatabase
-from lightrag import LightRAG, QueryParam
-from lightrag.llm.openai import openai_complete_if_cache, openai_embed
-from lightrag.kg.shared_storage import initialize_pipeline_status
 from openai import OpenAI
-from lightrag.utils import EmbeddingFunc
-import numpy as np
-import dspy
 
 config = configparser.ConfigParser()
 
@@ -17,8 +17,8 @@ config.read("config.ini")
 
 cohere_config = config["cohere"]
 # Maybe move to config?
-chat_model = cohere_config.get("chat_model", "command-a-03-2025")
-embed_model = cohere_config.get("embed_model", "embed-english-v3.0")
+chat_model = cohere_config.get("chat_model", "openai/command-a-03-2025")
+embed_model = cohere_config.get("embed_model", "openai/embed-english-v3.0")
 cohere_key = cohere_config.get("apikey")
 cohere_url = "https://api.cohere.ai/compatibility/v1"
 CHUNK_TOKEN_SIZE = 1024
