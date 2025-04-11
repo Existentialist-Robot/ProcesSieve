@@ -13,16 +13,17 @@ import dspy
 
 config = configparser.ConfigParser()
 
-config.read('config.ini')
+config.read("config.ini")
 
-cohere_config = config['cohere']
+cohere_config = config["cohere"]
 # Maybe move to config?
 chat_model = cohere_config.get("chat_model", "command-a-03-2025")
 embed_model = cohere_config.get("embed_model", "embed-english-v3.0")
-cohere_key = cohere_config.get('apikey')
+cohere_key = cohere_config.get("apikey")
 cohere_url = "https://api.cohere.ai/compatibility/v1"
 CHUNK_TOKEN_SIZE = 1024
 MAX_TOKENS = 4000
+
 
 async def llm_model_func(
     prompt, system_prompt=None, history_messages=[], keyword_extraction=False, **kwargs
@@ -37,6 +38,7 @@ async def llm_model_func(
         **kwargs,
     )
 
+
 async def embedding_func(texts: list[str]) -> np.ndarray:
     return await openai_embed(
         texts,
@@ -45,6 +47,7 @@ async def embedding_func(texts: list[str]) -> np.ndarray:
         base_url=cohere_url,
     )
 
+
 cohere_client = OpenAI(
     base_url=cohere_url,
     api_key=cohere_key,
@@ -52,16 +55,22 @@ cohere_client = OpenAI(
 
 dspy.configure(lm=dspy.LM(chat_model, api_key=cohere_key, api_base=cohere_url))
 
-nconf = config['neo4j']
+nconf = config["neo4j"]
 
-linkMlStore = LinkMlClient().attach_database(f'neo4j://{nconf.get('username')}:{nconf.get('password')}@{nconf.get('host')}/{nconf.get('database')}', alias='neo4j')
-linkMlDb = linkMlStore.get_collection(nconf.get('database', 'neo4j'))
+linkMlStore = LinkMlClient().attach_database(
+    f"neo4j://{nconf.get('username')}:{nconf.get('password')}@{nconf.get('host')}/{nconf.get('database')}",
+    alias="neo4j",
+)
+linkMlDb = linkMlStore.get_collection(nconf.get("database", "neo4j"))
 
-neoDriver = GraphDatabase().driver(f'neo4j://{nconf.get('host')}', auth=(nconf.get('username'), nconf.get('password')))
+neoDriver = GraphDatabase().driver(
+    f"neo4j://{nconf.get('host')}", auth=(nconf.get("username"), nconf.get("password"))
+)
 
-os.environ['NEO4J_URI'] = f'neo4j://{nconf.get('host')}'
-os.environ['NEO4J_PASSWORD'] = nconf.get('password')
-os.environ['NEO4J_USERNAME'] = nconf.get('username')
+os.environ["NEO4J_URI"] = f"neo4j://{nconf.get('host')}"
+os.environ["NEO4J_PASSWORD"] = nconf.get("password")
+os.environ["NEO4J_USERNAME"] = nconf.get("username")
+
 
 async def get_embedding_dim():
     test_text = ["This is a test sentence."]
@@ -69,13 +78,14 @@ async def get_embedding_dim():
     embedding_dim = embedding.shape[1]
     return embedding_dim
 
+
 async def initialize_rag():
     embedding_dimension = await get_embedding_dim()
     print(f"Detected embedding dimension: {embedding_dimension}")
 
     rag = LightRAG(
-        working_dir='./ragdir',
-        graph_storage="Neo4JStorage", #<-----------override KG default
+        working_dir="./ragdir",
+        graph_storage="Neo4JStorage",  # <-----------override KG default
         entity_extract_max_gleaning=1,
         enable_llm_cache=True,
         enable_llm_cache_for_entity_extract=True,
@@ -97,7 +107,9 @@ async def initialize_rag():
 
     return rag
 
+
 _RAG = None
+
 
 async def get_rag():
     global _RAG

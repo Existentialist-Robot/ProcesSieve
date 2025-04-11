@@ -67,8 +67,7 @@ classes:
         multivalued: true
 
   Case:
-    description:
-      The narrative description of an individual work unit we have solved or intend to solve.
+    description: The narrative description of an individual work unit we have solved or intend to solve.
     slots:
       - id
       - name
@@ -86,9 +85,6 @@ classes:
         range: Narrative
         multivalued: true
         required: true
-      reports:
-        range: Report
-        multivalued: true
       outcome:
         range: Report
         multivalued: true
@@ -97,6 +93,9 @@ classes:
 
   Report:
     description: A report contains a narrative and evaluations
+    attributes:
+      based_on:
+        range: ReportTemplate
     slots:
       - id
       - narrative
@@ -114,13 +113,12 @@ classes:
     attributes:
       process:
         range: ProgramTemplate
-      expected_outcome:
-        range: OutcomeTemplate
+      # expected_outcome:
+      #   range: ReportTemplate
       superseded_by:
         range: Rule
       situation_schema:
         range: SituationSchema
-
 
   Template:
     description: A schema that can be applied to a story
@@ -145,7 +143,7 @@ classes:
       threshold:
         range: float
 
-  OutcomeTemplate:
+  ReportTemplate:
     is_a: Template
     description:
       A template that describes a category of outcome we expect at the end of a ProcessTemplate,
@@ -155,10 +153,8 @@ classes:
         range: Objective
         multivalued: true
 
-
   ProgramTemplate:
-    description:
-      The actual process we will use to solve a given problem.
+    description: The actual process we will use to solve a given problem.
     slots:
       - id
       - name
@@ -172,17 +168,17 @@ classes:
         multivalued: true
       follows_process:
         range: ProgramTemplate
+      outcome:
+        range: ReportTemplate
 
   Role:
-    description:
-      A process involves certain actors playing certain roles in the process. This describes the roles.
+    description: A process involves certain actors playing certain roles in the process. This describes the roles.
     slots:
       - id
       - name
       - description
   Narrative:
-    description:
-      A narrative description of either a concrete or abstracted Case or ProgramTemplate. There can be many narratives.
+    description: A narrative description of either a concrete or abstracted Case or ProgramTemplate. There can be many narratives.
     slots:
       - id
       - authors
@@ -205,8 +201,7 @@ classes:
 
   Evaluation:
     # Not putting an Id, I expect we'll use the Id of the Objective
-    description:
-      The evaluation of an outcome with respect to one of the Program's Criteria
+    description: The evaluation of an outcome with respect to one of the Program's Criteria
     attributes:
       objective:
         range: Objective
@@ -230,20 +225,20 @@ slots:
     range: Person
   description:
   evaluations:
-   range: Evaluation
-   multivalued: true
+    range: Evaluation
+    multivalued: true
   narrative:
-   range: Narrative
-   required: true
+    range: Narrative
+    required: true
   narratives:
-   range: Narrative
-   multivalued: true
+    range: Narrative
+    multivalued: true
   status:
-   range: Status
-   ifabsent: Status(draft)
+    range: Status
+    ifabsent: Status(draft)
   when:
-   range: datetime
-   required: true
+    range: datetime
+    required: true
   prompt:
   schema_def:
     range: JSONSchema

@@ -5,13 +5,16 @@ from enum import Enum
 from pydantic import BaseModel, Field, create_model
 from pydantic.fields import FieldInfo
 
+
 def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
     new = deepcopy(field)
     new.default = default
     new.annotation = Optional[field.annotation]  # type: ignore
     return (new.annotation, new)
 
+
 BaseModelT = TypeVar("BaseModelT", bound=BaseModel)
+
 
 def to_optional(model: Type[BaseModelT]) -> Type[BaseModelT]:
     """Transform a schema into an equivalent optional schema"""
@@ -30,16 +33,17 @@ def to_optional(model: Type[BaseModelT]) -> Type[BaseModelT]:
 def clean(m: Union[Dict, List[Dict]]) -> Union[Dict, List[Dict]]:
     if isinstance(m, list):
         for r in m:
-            r.pop('category')
+            r.pop("category")
     else:
-        m.pop('category')
+        m.pop("category")
     return m
 
 
 def dump(m: BaseModel) -> dict:
     d = m.model_dump()
-    d['category'] = m.model_json_schema()['title']
+    d["category"] = m.model_json_schema()["title"]
     return d
+
 
 # From https://stackoverflow.com/a/79431514/439048
 type_mapping: dict[str, type] = {
@@ -51,7 +55,10 @@ type_mapping: dict[str, type] = {
     "object": dict,
 }
 
-def json_schema_to_base_model(schema: dict[str, Any], name: Optional[str]=None) -> Type[BaseModel]:
+
+def json_schema_to_base_model(
+    schema: dict[str, Any], name: Optional[str] = None
+) -> Type[BaseModel]:
     properties = schema.get("properties", {})
     required_fields = schema.get("required", [])
     model_fields = {}
@@ -99,4 +106,3 @@ def json_schema_to_base_model(schema: dict[str, Any], name: Optional[str]=None) 
         model_fields[field_name] = process_field(field_name, field_props)
 
     return create_model(name or schema.get("title"), **model_fields)
-
