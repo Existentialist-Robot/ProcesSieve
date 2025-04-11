@@ -27,6 +27,16 @@ class "ReportTemplate" [[{A template that describes a category of outcome we exp
 "Template" --> "1" "Narrative" : "narrative"
 "Template" ^-- "SituationSchema"
 "Template" ^-- "ReportTemplate"
+class "Skill" [[{A requisite skill to fulfill a role in a process}]] {
+    {field} id : ncname  
+    {field} name : string  
+    {field} description : string  
+}
+class "Proficiency" [[{A level of proficiency in a skill}]] {
+    {field} level : float  
+}
+"Skill" --> "0..*" "Skill" : "requisites"
+"Proficiency" --> "1" "Skill" : "skill"
 class "Rule" [[{The template that describes an entry in our best practice workbook, consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.}]] {
     {field} id : ncname  
     {field} name : string  
@@ -64,6 +74,7 @@ class "Role" [[{A process involves certain actors playing certain roles in the p
     {field} name : string  
     {field} description : string  
 }
+"Role" *--> "0..*" "Proficiency" : "skills"
 "ProgramTemplate" --> "0..*" "Role" : "roles"
 class "Objective" [[{None}]] {
     {field} id : ncname  
@@ -86,12 +97,15 @@ class "Evaluation" [[{The evaluation of an outcome with respect to one of the Pr
 "ProgramTemplate" --> "0..1" "ProgramTemplate" : "follows_process"
 "ProgramTemplate" --> "0..*" "ProgramTemplate" : "subprocesses"
 "ProgramTemplate" --> "1" "Narrative" : "narrative"
+"Organization" --> "0..*" "ProgramTemplate" : "core_programs"
 class "Person" [[{A person involved in a process}]] {
     {field} id : ncname  
     {field} name : string  
     {field} email : string  
 }
+"Person" *--> "0..*" "Proficiency" : "skills"
 "Narrative" --> "0..*" "Person" : "authors"
+"Organization" --> "0..*" "Person" : "personnel"
 "Organization" --> "0..*" "Case" : "casebook"
 "Organization" --> "0..*" "Organization" : "subunits"
 "Organization" --> "0..1" "Narrative" : "base_narrative"

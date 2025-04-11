@@ -32,6 +32,10 @@ classes:
     attributes:
       email:
         required: true
+      skills:
+        range: Proficiency
+        multivalued: true
+        # punting evidence
 
   Organization:
     description: An organization where persons work
@@ -55,6 +59,12 @@ classes:
       considered_rules:
         range: Rulebook
         required: true
+      personnel:
+        range: Person
+        multivalued: true
+      core_programs:
+        range: ProgramTemplate
+        multivalued: true
 
   Rulebook:
     # Not putting an Id yet, I expect we'll use the Id of the Organization + status
@@ -100,6 +110,27 @@ classes:
       - id
       - narrative
       - evaluations
+
+  Skill:
+    description: A requisite skill to fulfill a role in a process
+    slots:
+      - id
+      - name
+      - description
+    attributes:
+      requisites:
+        range: Skill
+        multivalued: true
+
+  Proficiency:
+    description: A level of proficiency in a skill
+    attributes:
+      level:
+        range: float
+        required: true
+      skill:
+        range: Skill
+        required: true
 
   Rule:
     description:
@@ -177,6 +208,11 @@ classes:
       - id
       - name
       - description
+    attributes:
+      skills:
+        range: Proficiency
+        multivalued: true
+
   Narrative:
     description: A narrative description of either a concrete or abstracted Case or ProgramTemplate. There can be many narratives.
     slots:

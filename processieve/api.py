@@ -18,6 +18,7 @@ from .models import (
     Role,
     Rule,
     SituationSchema,
+    Skill,
 )
 from .sieve import evaluate_many, evaluate_one
 from .utils import clean, dump, to_optional
@@ -604,6 +605,38 @@ def update_criterion(id: str, obj: to_optional(Criterion)) -> Criterion:
 @api_router.delete("/criterion/{id}")
 def delete_criterion(id: str) -> None:
     res = linkMlDb.find(dict(category="Criterion", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+
+@api_router.get("/skill")
+def get_criteria() -> List[Skill]:
+    res = linkMlDb.find({"category": "Skill"})
+    return clean(res.rows)
+
+
+@api_router.post("/skill")
+def add_skill(obj: Skill) -> Skill:
+    res = linkMlDb.store(dump(obj))
+    linkMlDb.commit()
+    return res
+
+
+@api_router.patch("/skill/{id}")
+def update_skill(id: str, obj: to_optional(Skill)) -> Skill:
+    if id != getattr(obj, "id", id):
+        raise BadRequest("Do not change the Id")
+    res = get_skill(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+
+@api_router.delete("/criterion/{id}")
+def delete_criterion(id: str) -> None:
+    res = linkMlDb.find(dict(category="Skill", id=id))
     if not res.num_rows:
         raise NotFound()
     linkMlDb.delete(res.rows[0])
