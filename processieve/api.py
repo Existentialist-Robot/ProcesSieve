@@ -54,7 +54,7 @@ def get_organization(id: str) -> Organization:
 
 @api_router.post("/organization")
 def add_organization(obj: Organization) -> Organization:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -94,7 +94,7 @@ def get_case(id: str) -> Case:
 
 @api_router.post("/case")
 def add_case(obj: Case) -> Case:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -134,7 +134,7 @@ def get_program_template(id: str) -> ProgramTemplate:
 
 @api_router.post("/program_template")
 def add_program_template(obj: ProgramTemplate) -> ProgramTemplate:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -176,7 +176,7 @@ def get_report(id: str) -> Report:
 
 @api_router.post("/report")
 def add_report(obj: Report) -> Report:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -216,7 +216,7 @@ def get_narrative(id: str) -> Narrative:
 
 @api_router.post("/narrative")
 def add_narrative(obj: Narrative) -> Narrative:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -256,7 +256,7 @@ def get_narrative(id: str) -> Narrative:
 
 @api_router.post("/narrative")
 def add_narrative(obj: Narrative) -> Narrative:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -296,7 +296,7 @@ def get_criterion(id: str) -> Organization:
 
 @api_router.post("/criterion")
 def add_criterion(obj: Organization) -> Organization:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -336,7 +336,7 @@ def get_evaluation(id: str) -> Evaluation:
 
 @api_router.post("/evaluation")
 def add_evaluation(obj: Evaluation) -> Evaluation:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -376,7 +376,7 @@ def get_person(id: str) -> Person:
 
 @api_router.post("/person")
 def add_person(obj: Person) -> Person:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -416,7 +416,7 @@ def get_role(id: str) -> Role:
 
 @api_router.post("/role")
 def add_role(obj: Role) -> Role:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -456,7 +456,7 @@ def get_report_template(id: str) -> ReportTemplate:
 
 @api_router.post("/report_template")
 def add_report_template(obj: ReportTemplate) -> ReportTemplate:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -496,7 +496,7 @@ def get_rule(id: str) -> Rule:
 
 @api_router.post("/rule")
 def add_rule(obj: Rule) -> Rule:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -536,7 +536,7 @@ def get_situation_schema(id: str) -> SituationSchema:
 
 @api_router.post("/situation_schema")
 def add_situation_schema(obj: SituationSchema) -> SituationSchema:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -578,7 +578,7 @@ def get_objective(id: str) -> Objective:
 
 @api_router.post("/objective")
 def add_objective(obj: Objective) -> Objective:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
@@ -610,7 +610,7 @@ def get_skills() -> List[Skill]:
 
 @api_router.post("/skill")
 def add_skill(obj: Skill) -> Skill:
-    res = linkMlDb.store(dump(obj))
+    res = linkMlDb.insert(dump(obj))
     linkMlDb.commit()
     return res
 
