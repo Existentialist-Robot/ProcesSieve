@@ -12,7 +12,7 @@ authors = [
 ]
 dependencies = [
     "cohere",
-    "dspy<2.6",
+    "dspy",
     "fastapi",
     "lightrag-hku",
     "linkml_store@git+https://github.com/maparent/linkml-store@main",

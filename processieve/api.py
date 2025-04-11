@@ -602,40 +602,8 @@ def delete_objective(id: str) -> None:
     linkMlDb.delete(res.rows[0])
 
 
-@api_router.get("/criterion")
-def get_criteria() -> List[Criterion]:
-    res = linkMlDb.find({"category": "Criterion"})
-    return clean(res.rows)
-
-
-@api_router.post("/criterion")
-def add_criterion(obj: Criterion) -> Criterion:
-    res = linkMlDb.store(dump(obj))
-    linkMlDb.commit()
-    return res
-
-
-@api_router.patch("/criterion/{id}")
-def update_criterion(id: str, obj: to_optional(Criterion)) -> Criterion:
-    if id != getattr(obj, "id", id):
-        raise BadRequest("Do not change the Id")
-    res = get_criterion(id)
-    res.update(obj)
-    res = linkMlDb.update(obj)
-    linkMlDb.commit()
-    return res
-
-
-@api_router.delete("/criterion/{id}")
-def delete_criterion(id: str) -> None:
-    res = linkMlDb.find(dict(category="Criterion", id=id))
-    if not res.num_rows:
-        raise NotFound()
-    linkMlDb.delete(res.rows[0])
-
-
 @api_router.get("/skill")
-def get_criteria() -> List[Skill]:
+def get_skills() -> List[Skill]:
     res = linkMlDb.find({"category": "Skill"})
     return clean(res.rows)
 
@@ -658,8 +626,8 @@ def update_skill(id: str, obj: to_optional(Skill)) -> Skill:
     return res
 
 
-@api_router.delete("/criterion/{id}")
-def delete_criterion(id: str) -> None:
+@api_router.delete("/skill/{id}")
+def delete_skill(id: str) -> None:
     res = linkMlDb.find(dict(category="Skill", id=id))
     if not res.num_rows:
         raise NotFound()

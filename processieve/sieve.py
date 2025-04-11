@@ -60,7 +60,7 @@ def get_dspy_module(schema_id: str, schema_type: str):
             input: str = dspy.InputField()
             output: output_schema = dspy.OutputField()
 
-        module = dspy.TypedPredictor(Signature)
+        module = dspy.Predict(Signature)
         _module_cache[(schema_id, schema_type)] = module
     return module
 
