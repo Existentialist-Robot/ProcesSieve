@@ -608,6 +608,14 @@ def get_skills() -> List[Skill]:
     return clean(res.rows)
 
 
+@api_router.get("/skill/{id}")
+def get_skill(id: str) -> Skill:
+    res = linkMlDb.find(dict(category="Skill", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    return clean(res.rows[0])
+
+
 @api_router.post("/skill")
 def add_skill(obj: Skill) -> Skill:
     res = linkMlDb.insert(dump(obj))
