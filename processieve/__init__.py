@@ -17,8 +17,8 @@ config.read("config.ini")
 
 cohere_config = config["cohere"]
 # Maybe move to config?
-chat_model = cohere_config.get("chat_model", "openai/command-a-03-2025")
-embed_model = cohere_config.get("embed_model", "openai/embed-english-v3.0")
+chat_model = cohere_config.get("chat_model", "command-a-03-2025")
+embed_model = cohere_config.get("embed_model", "embed-english-v3.0")
 cohere_key = cohere_config.get("apikey")
 cohere_url = "https://api.cohere.ai/compatibility/v1"
 CHUNK_TOKEN_SIZE = 1024
@@ -53,7 +53,9 @@ cohere_client = OpenAI(
     api_key=cohere_key,
 )
 
-dspy.configure(lm=dspy.LM(chat_model, api_key=cohere_key, api_base=cohere_url))
+dspy.configure(
+    lm=dspy.LM(f"openai/{chat_model}", api_key=cohere_key, api_base=cohere_url)
+)
 
 nconf = config["neo4j"]
 
