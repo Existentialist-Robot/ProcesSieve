@@ -65,9 +65,10 @@ linkMlStore = LinkMlClient().attach_database(
 )
 linkMlDb = linkMlStore.get_collection(nconf.get("database", "neo4j"))
 
-neoDriver = GraphDatabase().driver(
-    f"neo4j://{nconf.get('host')}", auth=(nconf.get("username"), nconf.get("password"))
-)
+neoDriver = linkMlDb.driver
+# neoDriver = GraphDatabase().driver(
+#     f"neo4j://{nconf.get('host')}", auth=(nconf.get("username"), nconf.get("password"))
+# )
 
 os.environ["NEO4J_URI"] = f"neo4j://{nconf.get('host')}"
 os.environ["NEO4J_PASSWORD"] = nconf.get("password")
@@ -118,3 +119,8 @@ async def get_rag():
     if _RAG is None:
         _RAG = await initialize_rag()
     return _RAG
+
+
+from .storage import create_id_constraints
+
+create_id_constraints()

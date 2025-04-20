@@ -1,5 +1,6 @@
 from copy import deepcopy
 from enum import Enum
+from inspect import isclass
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from pydantic import BaseModel, Field, create_model
@@ -106,3 +107,17 @@ def json_schema_to_base_model(
         model_fields[field_name] = process_field(field_name, field_props)
 
     return create_model(name or schema.get("title"), **model_fields, __base__=base)
+
+
+def list_models():
+    import processieve.models
+
+    base = processieve.models.ConfiguredBaseModel
+    for v in processieve.models.__dict__.values():
+        if (
+            isclass(v)
+            and issubclass(v, base)
+            and v is not base
+            and not getattr(v, "linkml_meta", {}).get("abstract", False)
+        ):
+            yield v
