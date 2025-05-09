@@ -1,7 +1,9 @@
 all: schema.svg processieve/models.py schema.png
 
+PATH = .venv/bin:%(PATH)
+
 processieve/models.py: schema.yaml
-	.venv/bin/gen-pydantic schema.yaml > processieve/models.py
+	gen-pydantic schema.yaml > processieve/models.py
 
 schema.puml: schema.yaml
 	gen-plantuml schema.yaml> schema.puml
