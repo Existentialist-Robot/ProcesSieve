@@ -103,6 +103,7 @@ class Person(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -135,6 +136,7 @@ class Organization(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -185,6 +187,7 @@ class Case(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -222,6 +225,7 @@ class Report(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -246,6 +250,7 @@ class Skill(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -288,6 +293,7 @@ class Rule(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -306,7 +312,7 @@ class Rule(ConfiguredBaseModel):
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'Template']} })
     process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'process', 'domain_of': ['Rule']} })
     superseded_by: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'superseded_by', 'domain_of': ['Rule']} })
-    situation_schema: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'situation_schema', 'domain_of': ['Rule']} })
+    situation_condition: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'situation_condition', 'domain_of': ['Rule']} })
 
 
 class Template(ConfiguredBaseModel):
@@ -323,6 +329,7 @@ class Template(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -334,6 +341,9 @@ class Template(ConfiguredBaseModel):
 
 
 class SituationSchema(Template):
+    """
+    A schema that describes questions applicable to a certain type of situation
+    """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
@@ -344,6 +354,7 @@ class SituationSchema(Template):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -352,6 +363,41 @@ class SituationSchema(Template):
     prompt: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'prompt', 'domain_of': ['Rule', 'Template']} })
     schema_def: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'schema_def', 'domain_of': ['Template']} })
     narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative', 'domain_of': ['Report', 'Template', 'ProgramTemplate']} })
+
+
+class SituationCondition(ConfiguredBaseModel):
+    """
+    Given that a situation fits a schema, what range of answers make a given rule applicable?
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
+         'domain_of': ['Person',
+                       'Organization',
+                       'Case',
+                       'Report',
+                       'Skill',
+                       'Rule',
+                       'Template',
+                       'SituationCondition',
+                       'Objective',
+                       'ProgramTemplate',
+                       'Role',
+                       'Narrative',
+                       'Criterion']} })
+    condition: str = Field(default=..., description="""an ordered list of: situation min-max ranges, situation comprehension, score for each attribute in the situation schema, and a corresponding applicability score.
+Example of condition: [
+{
+\"ranges\": {\"param1\": [3, 4]},
+\"lists\": {\"param2\": [true], \"param3\": ['enum1', 'enum4']},
+\"score\": 1.0},
+{
+\"ranges\": {\"param1\": [1, 6]},
+\"lists\": {\"param2\": [true], \"param3\": ['enum1', 'enum4', 'enum5']},
+\"score\": 0.8},
+]
+""", json_schema_extra = { "linkml_meta": {'alias': 'condition', 'domain_of': ['SituationCondition']} })
+    situation_schema: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'situation_schema', 'domain_of': ['SituationCondition']} })
 
 
 class Objective(ConfiguredBaseModel):
@@ -365,6 +411,7 @@ class Objective(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -390,6 +437,7 @@ class ReportTemplate(Template):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -414,6 +462,7 @@ class ProgramTemplate(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -432,7 +481,7 @@ class ProgramTemplate(ConfiguredBaseModel):
     roles: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'roles', 'domain_of': ['ProgramTemplate']} })
     subprocesses: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subprocesses', 'domain_of': ['ProgramTemplate']} })
     follows_process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'follows_process', 'domain_of': ['ProgramTemplate']} })
-    outcome: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case', 'ProgramTemplate']} })
+    outcome: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case', 'ProgramTemplate']} })
 
 
 class Role(ConfiguredBaseModel):
@@ -449,6 +498,7 @@ class Role(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -481,6 +531,7 @@ class Narrative(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -509,6 +560,7 @@ class Criterion(ConfiguredBaseModel):
                        'Skill',
                        'Rule',
                        'Template',
+                       'SituationCondition',
                        'Objective',
                        'ProgramTemplate',
                        'Role',
@@ -550,6 +602,7 @@ Proficiency.model_rebuild()
 Rule.model_rebuild()
 Template.model_rebuild()
 SituationSchema.model_rebuild()
+SituationCondition.model_rebuild()
 Objective.model_rebuild()
 ReportTemplate.model_rebuild()
 ProgramTemplate.model_rebuild()

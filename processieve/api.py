@@ -17,6 +17,7 @@ from .models import (
     ReportTemplate,
     Role,
     Rule,
+    SituationCondition,
     SituationSchema,
     Skill,
 )
@@ -195,46 +196,6 @@ def update_report(id: str, obj: to_optional(Report)) -> Report:
 @api_router.delete("/report/{id}")
 def delete_report(id: str) -> None:
     res = linkMlDb.find(dict(category="Report", id=id))
-    if not res.num_rows:
-        raise NotFound()
-    linkMlDb.delete(res.rows[0])
-
-
-@api_router.get("/narrative")
-def get_narratives() -> List[Narrative]:
-    res = linkMlDb.find({"category": "Narrative"})
-    return clean(res.rows)
-
-
-@api_router.get("/narrative/{id}")
-def get_narrative(id: str) -> Narrative:
-    res = linkMlDb.find(dict(category="Narrative", id=id))
-    if not res.num_rows:
-        raise NotFound()
-    return clean(res.rows[0])
-
-
-@api_router.post("/narrative")
-def add_narrative(obj: Narrative) -> Narrative:
-    res = linkMlDb.insert(dump(obj))
-    linkMlDb.commit()
-    return res
-
-
-@api_router.patch("/narrative/{id}")
-def update_narrative(id: str, obj: to_optional(Narrative)) -> Narrative:
-    if id != getattr(obj, "id", id):
-        raise BadRequest("Do not change the Id")
-    res = get_narrative(id)
-    res.update(obj)
-    res = linkMlDb.update(obj)
-    linkMlDb.commit()
-    return res
-
-
-@api_router.delete("/narrative/{id}")
-def delete_narrative(id: str) -> None:
-    res = linkMlDb.find(dict(category="Narrative", id=id))
     if not res.num_rows:
         raise NotFound()
     linkMlDb.delete(res.rows[0])
@@ -637,6 +598,48 @@ def update_skill(id: str, obj: to_optional(Skill)) -> Skill:
 @api_router.delete("/skill/{id}")
 def delete_skill(id: str) -> None:
     res = linkMlDb.find(dict(category="Skill", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    linkMlDb.delete(res.rows[0])
+
+
+@api_router.get("/situation_condition")
+def get_situation_conditions() -> List[SituationCondition]:
+    res = linkMlDb.find({"category": "SituationCondition"})
+    return clean(res.rows)
+
+
+@api_router.get("/situation_condition/{id}")
+def get_situation_condition(id: str) -> SituationCondition:
+    res = linkMlDb.find(dict(category="SituationCondition", id=id))
+    if not res.num_rows:
+        raise NotFound()
+    return clean(res.rows[0])
+
+
+@api_router.post("/situation_condition")
+def add_situation_condition(obj: SituationCondition) -> SituationCondition:
+    res = linkMlDb.insert(dump(obj))
+    linkMlDb.commit()
+    return res
+
+
+@api_router.patch("/situation_condition/{id}")
+def update_situation_condition(
+    id: str, obj: to_optional(SituationCondition)
+) -> SituationCondition:
+    if id != getattr(obj, "id", id):
+        raise BadRequest("Do not change the Id")
+    res = get_situation_condition(id)
+    res.update(obj)
+    res = linkMlDb.update(obj)
+    linkMlDb.commit()
+    return res
+
+
+@api_router.delete("/situation_condition/{id}")
+def delete_situation_condition(id: str) -> None:
+    res = linkMlDb.find(dict(category="SituationCondition", id=id))
     if not res.num_rows:
         raise NotFound()
     linkMlDb.delete(res.rows[0])

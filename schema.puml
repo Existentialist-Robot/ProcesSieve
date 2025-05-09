@@ -14,7 +14,7 @@ class "Narrative" [[{A narrative description of either a concrete or abstracted 
     {field} title : string  
     {field} content : string  
 }
-class "SituationSchema" [[{None}]] {
+class "SituationSchema" [[{A schema that describes questions applicable to a certain type of situation}]] {
     {field} id(i) : ncname  
     {field} prompt(i) : string  
     {field} schema_def(i) : JSONSchema  
@@ -37,13 +37,18 @@ class "Proficiency" [[{A level of proficiency in a skill}]] {
 }
 "Skill" --> "0..*" "Skill" : "requisites"
 "Proficiency" --> "1" "Skill" : "skill"
+class "SituationCondition" [[{Given that a situation fits a schema, what range of answers make a given rule applicable?}]] {
+    {field} id : ncname  
+    {field} condition : JSON  
+}
+"SituationCondition" --> "1" "SituationSchema" : "situation_schema"
 class "Rule" [[{The template that describes an entry in our best practice workbook, consisting of an (abstracted) situation we try to solve, and the process we intend to use to solve it.}]] {
     {field} id : ncname  
     {field} name : string  
     {field} description : string  
     {field} prompt : string  
 }
-"Rule" --> "0..1" "SituationSchema" : "situation_schema"
+"Rule" --> "1" "SituationCondition" : "situation_condition"
 class "Rulebook" [[{A set of rules}]] {
     {field} status : Status  
 }
@@ -85,7 +90,7 @@ class "Report" [[{A report contains a narrative and evaluations}]] {
     {field} id : ncname  
 }
 "ReportTemplate" --> "0..*" "Objective" : "objectives"
-"ProgramTemplate" --> "0..1" "ReportTemplate" : "outcome"
+"ProgramTemplate" --> "1" "ReportTemplate" : "outcome"
 "Report" --> "0..1" "ReportTemplate" : "based_on"
 class "Evaluation" [[{The evaluation of an outcome with respect to one of the Program's Criteria}]] {
     {field} value : float  

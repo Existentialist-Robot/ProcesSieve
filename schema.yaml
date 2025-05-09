@@ -148,8 +148,9 @@ classes:
       #   range: ReportTemplate
       superseded_by:
         range: Rule
-      situation_schema:
-        range: SituationSchema
+      situation_condition:
+        range: SituationCondition
+        required: true
 
   Template:
     description: A schema that can be applied to a story
@@ -161,7 +162,32 @@ classes:
       - narrative
 
   SituationSchema:
+    description: A schema that describes questions applicable to a certain type of situation
     is_a: Template
+
+  SituationCondition:
+    description: Given that a situation fits a schema, what range of answers make a given rule applicable?
+    slots:
+      - id
+    attributes:
+      condition:
+        range: JSON
+        required: true
+        description: |
+          an ordered list of: situation min-max ranges, situation comprehension, score for each attribute in the situation schema, and a corresponding applicability score.
+          Example of condition: [
+          {
+          "ranges": {"param1": [3, 4]},
+          "lists": {"param2": [true], "param3": ['enum1', 'enum4']},
+          "score": 1.0},
+          {
+          "ranges": {"param1": [1, 6]},
+          "lists": {"param2": [true], "param3": ['enum1', 'enum4', 'enum5']},
+          "score": 0.8},
+          ]
+      situation_schema:
+        range: SituationSchema
+        required: true
 
   Objective:
     slots:
@@ -201,6 +227,7 @@ classes:
         range: ProgramTemplate
       outcome:
         range: ReportTemplate
+        required: true
 
   Role:
     description: A process involves certain actors playing certain roles in the process. This describes the roles.
