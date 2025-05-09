@@ -15,7 +15,7 @@ dependencies = [
     "dspy",
     "fastapi",
     "lightrag-hku",
-    "linkml_store@git+https://github.com/linkml/linkml-store@main",
+    "linkml_store>=0.2.10rc1",
     "linkml",
     "matplotlib",
     "neo4j",
