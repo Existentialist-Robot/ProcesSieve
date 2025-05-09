@@ -1,9 +1,10 @@
 # drive.py
 import re
+from urllib.parse import parse_qs, urlparse
+
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from urllib.parse import urlparse, parse_qs
 
 
 class GoogleDriveHandler:
@@ -135,6 +136,8 @@ class GoogleDriveHandler:
                     q=f"'{self.folder_id}' in parents and trashed = false",
                     spaces="drive",
                     fields="files(id, name, permissions)",
+                    includeTeamDriveItems=True,
+                    supportsAllDrives=True,
                     pageSize=10,
                 )
                 .execute()
