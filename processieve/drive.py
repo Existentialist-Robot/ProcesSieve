@@ -33,19 +33,30 @@ class GoogleDriveHandler:
         if folder_id_match:
             self.folder_id = folder_id_match.group(1)
             print(f"✅ Folder ID extracted (regex): {self.folder_id}")
-            return
 
-        parsed_url = urlparse(folder_url)
-        query_params = parse_qs(parsed_url.query)
-        folder_id = query_params.get("id", [None])[0]
-        if folder_id:
+        else:
+            parsed_url = urlparse(folder_url)
+            query_params = parse_qs(parsed_url.query)
+            folder_id = query_params.get("id", [None])[0]
+            if not folder_id:
+                raise ValueError(
+                    "Invalid Google Drive folder URL. Ensure it is a shared folder link."
+                )
+
             self.folder_id = folder_id
             print(f"✅ Folder ID extracted (query param): {self.folder_id}")
-            return
 
-        raise ValueError(
-            "Invalid Google Drive folder URL. Ensure it is a shared folder link."
-        )
+        try:
+            r = (
+                self.drive_service.files()
+                .get(fileId=self.folder_id, supportsAllDrives=True)
+                .execute()
+            )
+            print(r)
+            self.drive_id = r["driveId"]
+        except:
+            print("Could not get the driveId")
+            raise
 
     def create_document(self, title: str, text: str, share_email: str = None):
         """Create a Google Doc in the specified folder and insert text."""
@@ -57,12 +68,17 @@ class GoogleDriveHandler:
             "name": title,
             "parents": [self.folder_id],
             "mimeType": "application/vnd.google-apps.document",
+            "teamDriveId": self.drive_id,
         }
 
         print(file_metadata)
 
         try:
-            doc = self.drive_service.files().create(body=file_metadata).execute()
+            doc = (
+                self.drive_service.files()
+                .create(body=file_metadata, supportsAllDrives=True)
+                .execute()
+            )
             doc_id = doc.get("id")
             print(f"✅ Document created: {title} (ID: {doc_id})")
         except HttpError as e:
