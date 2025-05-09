@@ -12,8 +12,6 @@ from enum import Enum
 from typing import (
     Any,
     ClassVar,
-    Dict,
-    List,
     Literal,
     Optional,
     Union
@@ -47,7 +45,7 @@ class ConfiguredBaseModel(BaseModel):
 
 
 class LinkMLMeta(RootModel):
-    root: Dict[str, Any] = {}
+    root: dict[str, Any] = {}
     model_config = ConfigDict(frozen=True)
 
     def __getattr__(self, key:str):
@@ -120,7 +118,7 @@ class Person(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     email: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'email', 'domain_of': ['Person']} })
-    skills: Optional[List[Proficiency]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'skills', 'domain_of': ['Person', 'Role']} })
+    skills: Optional[list[Proficiency]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'skills', 'domain_of': ['Person', 'Role']} })
 
 
 class Organization(ConfiguredBaseModel):
@@ -153,12 +151,12 @@ class Organization(ConfiguredBaseModel):
                        'Criterion']} })
     mission_statetement: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'mission_statetement', 'domain_of': ['Organization']} })
     base_narrative: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'base_narrative', 'domain_of': ['Organization']} })
-    subunits: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subunits', 'domain_of': ['Organization']} })
-    casebook: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'casebook', 'domain_of': ['Organization']} })
+    subunits: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subunits', 'domain_of': ['Organization']} })
+    casebook: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'casebook', 'domain_of': ['Organization']} })
     rulebook: Rulebook = Field(default=..., description="""The best practice workbook of the organization""", json_schema_extra = { "linkml_meta": {'alias': 'rulebook', 'domain_of': ['Organization']} })
     considered_rules: Rulebook = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'considered_rules', 'domain_of': ['Organization']} })
-    personnel: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'personnel', 'domain_of': ['Organization']} })
-    core_programs: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'core_programs', 'domain_of': ['Organization']} })
+    personnel: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'personnel', 'domain_of': ['Organization']} })
+    core_programs: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'core_programs', 'domain_of': ['Organization']} })
 
 
 class Rulebook(ConfiguredBaseModel):
@@ -170,7 +168,7 @@ class Rulebook(ConfiguredBaseModel):
     status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
          'domain_of': ['Rulebook', 'Narrative'],
          'ifabsent': 'Status(draft)'} })
-    rules: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'rules', 'domain_of': ['Rulebook']} })
+    rules: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'rules', 'domain_of': ['Rulebook']} })
 
 
 class Case(ConfiguredBaseModel):
@@ -201,12 +199,12 @@ class Case(ConfiguredBaseModel):
                        'ProgramTemplate',
                        'Role',
                        'Criterion']} })
-    narratives: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'narratives', 'domain_of': ['Case']} })
+    narratives: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'narratives', 'domain_of': ['Case']} })
     idealized: bool = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'idealized', 'domain_of': ['Case']} })
     selected_template: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'selected_template', 'domain_of': ['Case']} })
-    considered_templates: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_templates', 'domain_of': ['Case']} })
-    brief: List[str] = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'brief', 'domain_of': ['Case']} })
-    outcome: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case', 'ProgramTemplate']} })
+    considered_templates: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'considered_templates', 'domain_of': ['Case']} })
+    brief: list[str] = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'brief', 'domain_of': ['Case']} })
+    outcome: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case', 'ProgramTemplate']} })
     outcome_analysis: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome_analysis', 'domain_of': ['Case']} })
 
 
@@ -230,7 +228,7 @@ class Report(ConfiguredBaseModel):
                        'Narrative',
                        'Criterion']} })
     narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative', 'domain_of': ['Report', 'Template', 'ProgramTemplate']} })
-    evaluations: Optional[List[Evaluation]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evaluations', 'domain_of': ['Report']} })
+    evaluations: Optional[list[Evaluation]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evaluations', 'domain_of': ['Report']} })
     based_on: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'based_on', 'domain_of': ['Report']} })
 
 
@@ -263,7 +261,7 @@ class Skill(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Skill', 'Rule', 'Role', 'Criterion']} })
-    requisites: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'requisites', 'domain_of': ['Skill']} })
+    requisites: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'requisites', 'domain_of': ['Skill']} })
 
 
 class Proficiency(ConfiguredBaseModel):
@@ -383,7 +381,7 @@ class ReportTemplate(Template):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://processieve.com/schemas/v0#'})
 
-    objectives: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'objectives', 'domain_of': ['ReportTemplate']} })
+    objectives: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'objectives', 'domain_of': ['ReportTemplate']} })
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id',
          'domain_of': ['Person',
                        'Organization',
@@ -431,8 +429,8 @@ class ProgramTemplate(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     narrative: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'narrative', 'domain_of': ['Report', 'Template', 'ProgramTemplate']} })
-    roles: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'roles', 'domain_of': ['ProgramTemplate']} })
-    subprocesses: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subprocesses', 'domain_of': ['ProgramTemplate']} })
+    roles: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'roles', 'domain_of': ['ProgramTemplate']} })
+    subprocesses: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'subprocesses', 'domain_of': ['ProgramTemplate']} })
     follows_process: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'follows_process', 'domain_of': ['ProgramTemplate']} })
     outcome: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'outcome', 'domain_of': ['Case', 'ProgramTemplate']} })
 
@@ -466,7 +464,7 @@ class Role(ConfiguredBaseModel):
                        'Role',
                        'Criterion']} })
     description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'description', 'domain_of': ['Skill', 'Rule', 'Role', 'Criterion']} })
-    skills: Optional[List[Proficiency]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'skills', 'domain_of': ['Person', 'Role']} })
+    skills: Optional[list[Proficiency]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'skills', 'domain_of': ['Person', 'Role']} })
 
 
 class Narrative(ConfiguredBaseModel):
@@ -488,7 +486,7 @@ class Narrative(ConfiguredBaseModel):
                        'Role',
                        'Narrative',
                        'Criterion']} })
-    authors: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Narrative']} })
+    authors: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'authors', 'domain_of': ['Narrative']} })
     status: Optional[Status] = Field(default='draft', json_schema_extra = { "linkml_meta": {'alias': 'status',
          'domain_of': ['Rulebook', 'Narrative'],
          'ifabsent': 'Status(draft)'} })
