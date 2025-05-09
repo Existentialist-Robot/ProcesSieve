@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # Note on scopes: see https://developers.google.com/identity/protocols/oauth2/scopes#drive
+# Experiment with https://developers.google.com/workspace/drive/api/reference/rest/v3/files
 
 
 class GoogleDriveHandler:
@@ -52,10 +53,10 @@ class GoogleDriveHandler:
                 .get(fileId=self.folder_id, supportsAllDrives=True)
                 .execute()
             )
-            print(r)
             self.drive_id = r["driveId"]
+            print(f"✅ Drive ID extracted: {self.drive_id}")
         except:
-            print("Could not get the driveId")
+            print("Could not get the driveId, do we have access to that folder?")
             raise
 
     def create_document(self, title: str, text: str, share_email: str = None):
@@ -113,29 +114,44 @@ class GoogleDriveHandler:
 
         print(f"Using folder ID: {self.folder_id}")  # Debug log
         spreadsheet = {
-            "properties": {"title": title, "parents": [{"id": self.folder_id}]},
-            "sheets": [{"properties": {"sheetType": "GRID", "title": "Sheet1"}}],
+            "name": title,
+            "parents": [self.folder_id],
+            "teamDriveId": self.drive_id,
+            "mimeType": "application/vnd.google-apps.spreadsheet",
         }
 
+        # TODO maybe: Set sheet properties
+        # "properties": {
+        #     "sheets": [{"properties": {"sheetType": "GRID", "title": "Sheet1"}}],
+        # }
+
         try:
-            spreadsheet = (
-                self.sheets_service.spreadsheets().create(body=spreadsheet).execute()
+            spreadsheet_r = (
+                self.drive_service.files()
+                .create(body=spreadsheet, supportsAllDrives=True)
+                .execute()
             )
-            spreadsheet_id = spreadsheet.get("spreadsheetId")
+            spreadsheet_id = spreadsheet_r.get("id")
             print(f"✅ Spreadsheet created: {title} (ID: {spreadsheet_id})")
+
         except HttpError as e:
             print(f"❌ Error creating spreadsheet: {e}")
             raise
 
         if data:
             try:
-                self.sheets_service.spreadsheets().values().update(
-                    spreadsheetId=spreadsheet_id,
-                    range="Sheet1!A1",
-                    valueInputOption="RAW",
-                    body={"values": data},
-                ).execute()
-                print(f"✍️ Data inserted into the spreadsheet.")
+                r = (
+                    self.sheets_service.spreadsheets()
+                    .values()
+                    .update(
+                        spreadsheetId=spreadsheet_id,
+                        range="A1",
+                        valueInputOption="RAW",
+                        body={"values": data},
+                    )
+                    .execute()
+                )
+                print(f"✍️ Data inserted into the spreadsheet at {r['updatedRange']}")
             except HttpError as e:
                 print(f"❌ Error inserting data into spreadsheet: {e}")
                 raise
