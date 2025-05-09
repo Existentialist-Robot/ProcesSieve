@@ -6,9 +6,15 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Note on scopes: see https://developers.google.com/identity/protocols/oauth2/scopes#drive
+
 
 class GoogleDriveHandler:
-    def __init__(self, service_account_file, scopes):
+    def __init__(
+        self,
+        service_account_file,
+        scopes=["https://www.googleapis.com/auth/drive.readonly"],
+    ):
         self.service_account_file = service_account_file
         self.scopes = scopes
         self._authenticate()
