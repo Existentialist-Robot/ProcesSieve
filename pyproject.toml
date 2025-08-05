@@ -34,3 +34,12 @@ dependencies = [
 test = ["asgi-lifespan", "pytest-asyncio", "pytest"]
 docs = ["Sphinx"]
 dev = ["ipython"]
+
+[build-system]
+requires = ["uv_build>=0.8.5"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "processieve"
+module-root = "."
+allow-direct-references = true
