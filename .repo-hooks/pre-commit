@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+# Portable secret guard: refuses a commit whose STAGED ADDITIONS contain a high-signal credential.
+#
+# VENDORED, NOT AUTHORED HERE. The upstream is eden-os `tools/hooks/portable/pre-commit`
+# (T146, ruled under D-567 option A). The recipient's pin (`.repo-relation.yaml`
+# `tooling.vendored_files`, or `.repo-hooks/VENDORED` where no declaration exists) records the
+# upstream commit and the sha256 of these bytes. Fix it upstream and re-vendor; a local edit is
+# detectable and is drift. `.repo-hooks/pre-merge-commit` is a two-line shim that runs this file,
+# because Git runs `pre-merge-commit`, not `pre-commit`, for a merge commit with no conflicts.
+# That covers true merge commits only: a fast-forward, a rebase or a cherry-pick of a
+# `--no-verify` commit runs no hook at all.
+#
+# Armed per repository by a LOCAL, RELATIVE `core.hooksPath=.repo-hooks`. That value is local Git
+# configuration: it is never cloned, so a fresh clone is ungated until armed.
+#
+# What it does: one `git diff --cached` over the whole commit, added lines only, offline, no
+# working-tree reads. It carries ONLY the secret scan extracted from nat-personal
+# `dev/githooks/pre-commit`; that hook's lease, registry, deliverable, backlog and lane gates are
+# repository-specific and are deliberately absent.
+#
+# Differences from that source, each measured:
+#   1. `--diff-filter=ACMR`, not `ACM`. A renamed-AND-edited file is an R entry, which `ACM`
+#      drops. With R kept, the diff of a renamed file shows only the lines added relative to the
+#      old file, so a pure rename of a file that already held a key is NOT refused.
+#   2. It FAILS CLOSED when a tool it needs is missing, or when `git diff` itself fails.
+#   3. Byte semantics: `LC_ALL=C` and `grep -a` throughout. Under a UTF-8 locale GNU grep treats a
+#      line holding a non-UTF-8 byte (a cp1252 smart quote, a Latin-1 accent) as binary and drops
+#      it, so a key on that line passed.
+#   4. Case-SENSITIVE patterns (only the allowlist pragma is case-insensitive). `grep -Ei` made
+#      `AKIA...` match random base64 in data URIs and notebooks.
+#   5. `--no-ext-diff --no-textconv`, so neither `diff.external`, `GIT_EXTERNAL_DIFF` nor a
+#      textconv driver can hide the added lines.
+#   6. Content Git calls BINARY (a NUL byte, UTF-16 text, a `-diff` attribute) is scanned whole
+#      from the staged blob with NUL bytes removed, which reads UTF-16 ASCII text as ASCII. A
+#      binary file at a HIGH-RISK PATH (.env*, *.pem, *.key, *.p12, *.pfx, *.jks, *.keystore,
+#      id_rsa*, id_dsa*, id_ecdsa*, id_ed25519* except *.pub, credentials.json) is refused by
+#      name: it cannot be read reliably. Caveat: a Keynote deck is also `*.key`, so committing
+#      one is refused too; use `--no-verify` for it.
+#      No match test ends in `grep -q` or `head`: under pipefail an early exit kills the writer
+#      with SIGPIPE, and a hit with more than a pipe's worth of data after it read as a pass.
+#   7. An added line that begins `++` is scanned. Only the `+++` file header is skipped.
+#
+# What it catches: GitHub tokens (classic, fine-grained), Slack tokens and incoming-webhook URLs,
+# AWS access key ids (AKIA, ASIA) and AWS secret access keys in an assignment, Google API keys,
+# OpenAI/Anthropic `sk-` keys, Stripe live keys, PEM and PGP private-key blocks.
+#
+# OUT OF SCOPE -- do not assume coverage of any of these:
+#   - generic `.env` secrets (`DB_PASSWORD=`, `JWT_SECRET=`), passwords in URLs, high-entropy
+#     strings, and vendors not listed above;
+#   - anything already in history: only the lines this commit ADDS are read, so a pure rename or
+#     copy of a file that already holds a key passes;
+#   - `git commit --no-verify`, and any clone or worktree where the hook is not armed.
+#
+# WHERE THE GUARD SILENTLY DISAPPEARS (Git skips a missing hook without a word):
+#   - a linked worktree checked out on a branch that predates the vendoring: the relative
+#     `core.hooksPath` resolves against THAT worktree's tree. `rollout check` lists every worktree
+#     and reports each one missing the hook as BROKEN;
+#   - a commit that deletes `.repo-hooks/pre-commit` runs no hook at all, including the commit
+#     that deletes it.
+# TRUST: the hook's code comes from the checked-out tree, so a pulled commit that edits
+# `.repo-hooks/pre-commit` runs on your next commit. That is nat-personal's model too. For the
+# organisation repos, server-side secret scanning (push protection) is the backstop that cannot
+# be skipped.
+#
+# False positive? Append this to the offending line:   pragma: allowlist secret
+# Hard override (discouraged, leaves a trail):          git commit --no-verify
+set -uo pipefail
+export LC_ALL=C
+
+block_closed() {
+  echo "COMMIT BLOCKED: the portable secret guard $1" >&2
+  echo "  The guard fails closed rather than pass a commit it could not scan." >&2
+  echo "  Override (discouraged):  git commit --no-verify" >&2
+  exit 1
+}
+
+for tool in git awk grep cut uniq mktemp tr cat rm; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    block_closed "needs '$tool' and it is not on PATH."
+  fi
+done
+
+tmpd="$(mktemp -d 2>/dev/null)" || block_closed "could not create a temp directory."
+trap 'rm -rf "$tmpd"' EXIT
+
+DIFF_OPTS=(--cached --no-color --no-ext-diff --no-textconv --diff-filter=ACMR)
+
+git -c core.quotePath=false diff "${DIFF_OPTS[@]}" --name-only -z > "$tmpd/names" \
+  || block_closed "could not list the staged files (git diff failed)."
+staged_files=()
+while IFS= read -r -d '' f; do
+  [ -n "$f" ] && staged_files+=("$f")
+done < "$tmpd/names"
+
+# High-signal patterns only -- keep tight to avoid noise/false blocks. Matched case-SENSITIVELY.
+patterns='(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}'          # GitHub PAT (classic)
+patterns="$patterns"'|github_pat_[A-Za-z0-9_]{22,}'         # GitHub PAT (fine-grained)
+patterns="$patterns"'|xox[baprs]-[A-Za-z0-9-]{10,}'         # Slack bot/user/legacy tokens
+patterns="$patterns"'|xoxe\.xox[bp]-[A-Za-z0-9-]{10,}'      # Slack app-config tokens
+patterns="$patterns"'|xapp-[0-9]-[A-Za-z0-9-]+'             # Slack app-level tokens
+patterns="$patterns"'|hooks\.slack\.com/services/T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+'  # Slack webhook
+patterns="$patterns"'|(AKIA|ASIA)[0-9A-Z]{16}'  # AWS access key id (long-term, STS), no boundary
+patterns="$patterns"'|[Ss][Ee][Cc][Rr][Ee][Tt]_?[Aa][Cc][Cc][Ee][Ss][Ss]_?[Kk][Ee][Yy]["'"'"']?[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9/+]{40}([^A-Za-z0-9/+=]|$)'  # AWS secret access key, assigned
+patterns="$patterns"'|(^|[^A-Za-z0-9]|\\[nrt])AIza[0-9A-Za-z_-]{35}'  # Google API key; a \n \r \t escape is a boundary
+patterns="$patterns"'|(^|[^A-Za-z0-9/.-])sk-(ant-)?[A-Za-z0-9_-]{20,}'  # OpenAI / Anthropic (not a path segment)
+patterns="$patterns"'|[rs]k_live_[0-9A-Za-z]{20,}'          # Stripe live secret / restricted key
+patterns="$patterns"'|-----BEGIN [A-Z ]*PRIVATE KEY( BLOCK)?-----'  # PEM and PGP private keys
+
+# Added lines of a unified diff. A `+++`/`---` line is a file header only before the first `@@`
+# of its file; inside a hunk it is an added/removed line that begins `++`/`--`.
+# Prints `k<TAB>+line` per added line, `k<TAB>B` for a file Git renders as binary, and the
+# file count to the file named by cf (when given).
+extract() {
+  awk -v cf="${1:-}" '
+    /^diff --git /                 { k++; hunk = 0; next }
+    !hunk && /^@@ /                { hunk = 1; next }
+    !hunk && /^Binary files /      { print k "\tB"; next }
+    !hunk                          { next }
+    /^\+/                          { print k "\t" $0 }
+    END                            { if (cf != "") print k + 0 > cf }'
+}
+
+risky_path() {
+  local b="${1##*/}"
+  case "$b" in
+    *.example|*.sample|*.template|*.dist|*.pub) return 1 ;;
+    .env|.env.*|*.env|*.pem|*.key|*.p12|*.pfx|*.jks|*.keystore|id_rsa*|id_dsa*|id_ecdsa*|id_ed25519*|credentials.json) return 0 ;;
+  esac
+  return 1
+}
+
+bad=""
+risky=""
+
+# A binary file: refuse by name at a high-risk path, otherwise scan the whole staged blob.
+scan_binary() {
+  local f="$1"
+  if risky_path "$f"; then
+    risky="$risky  $f"$'\n'
+    return
+  fi
+  local blob
+  blob="$(git rev-parse -q --verify ":$f" 2>/dev/null)" \
+    || block_closed "could not resolve the staged blob of '$f'."
+  if git cat-file blob "$blob" | tr -d '\000' \
+       | grep -a -vi 'pragma: allowlist secret' \
+       | grep -a -E "$patterns" >/dev/null; then
+    bad="$bad  $f"$'\n'
+  fi
+}
+
+# Per-file loop: the fallback, and the reference the one-pass scan is tested against.
+secret_scan_legacy() {
+  local f out
+  for f in "${staged_files[@]}"; do
+    git -c core.quotePath=false diff "${DIFF_OPTS[@]}" -U0 -- "$f" > "$tmpd/one" \
+      || block_closed "could not diff '$f' (git diff failed)."
+    out="$(extract < "$tmpd/one" | cut -f2-)"
+    if printf '%s\n' "$out" | grep -a -x 'B' >/dev/null; then
+      scan_binary "$f"
+    elif printf '%s\n' "$out" | grep -a -vi 'pragma: allowlist secret' \
+           | grep -a -E "$patterns" >/dev/null; then
+      bad="$bad  $f"$'\n'
+    fi
+  done
+}
+
+# One pass: the k-th `diff --git` header is staged_files[k-1], because both come from the same
+# diff queue with the same filter. If the counts ever disagree, the result is discarded and the
+# per-file loop runs -- slow, never wrong.
+# REPO_HOOKS_SECRET_SCAN=legacy forces the per-file loop (the equivalence test uses it).
+if [ "${#staged_files[@]}" -gt 0 ]; then
+  if [ "${REPO_HOOKS_SECRET_SCAN:-}" = "legacy" ]; then
+    secret_scan_legacy
+  else
+    git -c core.quotePath=false diff "${DIFF_OPTS[@]}" -U0 > "$tmpd/diff" \
+      || block_closed "could not diff the staged changes (git diff failed)."
+    extract "$tmpd/count" < "$tmpd/diff" > "$tmpd/added"
+    sec_n="$(cat "$tmpd/count" 2>/dev/null)"
+    if [ "$sec_n" = "${#staged_files[@]}" ]; then
+      bin_ks="$(awk -F'\t' '$2 == "B" { print $1 }' "$tmpd/added")"
+      sec_hits="$(awk -F'\t' '$2 != "B"' "$tmpd/added" \
+        | grep -a -vi 'pragma: allowlist secret' \
+        | grep -a -E "$patterns" \
+        | cut -f1 | uniq)"
+      for i in $sec_hits; do
+        bad="$bad  ${staged_files[$((i - 1))]}"$'\n'
+      done
+      for i in $bin_ks; do
+        scan_binary "${staged_files[$((i - 1))]}"
+      done
+    else
+      secret_scan_legacy
+    fi
+  fi
+fi
+
+if [ -n "$bad" ] || [ -n "$risky" ]; then
+  echo "" >&2
+  if [ -n "$bad" ]; then
+    echo "COMMIT BLOCKED -- possible secret(s) added in:" >&2
+    printf '%s' "$bad" >&2
+  fi
+  if [ -n "$risky" ]; then
+    echo "COMMIT BLOCKED -- binary content at a high-risk path, which this guard cannot read:" >&2
+    printf '%s' "$risky" >&2
+  fi
+  echo "  Rotate the credential and remove it before committing." >&2
+  echo "  False positive?  append '# pragma: allowlist secret' to that line." >&2
+  echo "  Override (discouraged):  git commit --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+exit 0

@@ -1,0 +1,18 @@
+# Pins for the vendored .repo-hooks/ files. Written by eden-os
+# `python -m tools.hooks.portable.rollout vendor`. Do not edit the hooks here: fix them
+# upstream and re-vendor. `sha256` is of the bytes as vendored (LF). One block per file.
+from: eden-os
+upstream_path: tools/hooks/portable/pre-commit
+path: .repo-hooks/pre-commit
+upstream_sha: b3291d955ffef2b8f623ce13bd83740bdfa45993
+sha256: 11cb2f006b83aaa3a6ae4ea53f120dc7aa0a2f33c6c821b705adfd79fd253ea7
+policy: readonly
+note: portable secret-scanning pre-commit; D-567 option A
+
+from: eden-os
+upstream_path: tools/hooks/portable/pre-merge-commit
+path: .repo-hooks/pre-merge-commit
+upstream_sha: b3291d955ffef2b8f623ce13bd83740bdfa45993
+sha256: 5cc6e61e389d1d9d16aa442f74ca2fe922904042a5839764a8a13b7a135b7677
+policy: readonly
+note: pre-merge-commit shim running the portable pre-commit; D-567 option A

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Vendored with .repo-hooks/pre-commit (eden-os tools/hooks/portable, T146, D-567 option A).
+# Git runs pre-merge-commit, not pre-commit, for a merge commit with no conflicts: without this
+# shim every clean merge lands unscanned (nat-personal packet 195, 2026-09-11). Same scan, same
+# staged index (the merge result against the first parent). True merge commits only: a
+# fast-forward, a rebase or a cherry-pick of a `--no-verify` commit runs no hook at all.
+exec "$(dirname "$0")/pre-commit" "$@"

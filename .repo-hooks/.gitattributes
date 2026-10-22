@@ -1,0 +1,2 @@
+# Vendored hook bytes stay LF on every checkout: bash cannot run a CRLF script.
+* text eol=lf
