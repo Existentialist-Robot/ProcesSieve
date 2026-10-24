@@ -1,0 +1,23 @@
+# .repo-relation.yaml: a machine-readable statement of where this repository sits among the
+# repositories it is maintained beside. The graph is keyed by repository NAME; nothing here is a path.
+repo: processieve
+plane: tooling                     # a public repository holds no private context, so it is not a
+                                   # link in a context chain; it stands on its own
+canonical_home: origin             # the hosted repository is the canonical copy
+writers: multiple                  # several contributors in the history
+
+context:
+  upstream: ~                      # downstream of nothing
+  receives: []
+  emits_upstream: false
+  readable_by_root: true
+
+tooling:
+  source: ~                        # mounts no tooling repository
+  mode: ~
+  vendored_upstream_sha: ~
+
+startup:
+  tier0: [.repo-relation.yaml]
+  tier1: README.md
+  tier2_on_demand: [schema.yaml, Makefile]
