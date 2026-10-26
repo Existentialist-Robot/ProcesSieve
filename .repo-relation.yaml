@@ -19,8 +19,8 @@ tooling:
 
 startup:
   tier0: [.repo-relation.yaml]
-  tier1: README.md
-  tier2_on_demand: [schema.yaml, Makefile]
+  tier1: AGENTS.md
+  tier2_on_demand: [README.md, schema.yaml, Makefile]
 
 # Architecture record (an inactive, declarative profile; nothing here is enforced or run).
 architecture:
