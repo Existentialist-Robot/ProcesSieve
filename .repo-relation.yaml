@@ -21,3 +21,15 @@ startup:
   tier0: [.repo-relation.yaml]
   tier1: README.md
   tier2_on_demand: [schema.yaml, Makefile]
+
+# Architecture record (an inactive, declarative profile; nothing here is enforced or run).
+architecture:
+  # R6, assessment rank 1: one revision-pinned surface -> role/mechanism crosswalk row.
+  # `blob` is the surface's git blob at `revision`, so a later edit to it reads as drift.
+  crosswalk:
+    - surface: README.md
+      role: routing-layout
+      mechanism: 'README.md is the orientation page: what the engine does, its stack, data model,
+        setup and API; schema.yaml and the Makefile are on demand'
+      revision: 3ec218ef9875eadf9541ff79834a7d0a8b65c43c
+      blob: 48da5fd4ce7f457b10c3f80c35f7aebc925f6b3b
