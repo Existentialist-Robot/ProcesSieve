@@ -33,3 +33,10 @@ architecture:
         setup and API; schema.yaml and the Makefile are on demand'
       revision: 3ec218ef9875eadf9541ff79834a7d0a8b65c43c
       blob: 48da5fd4ce7f457b10c3f80c35f7aebc925f6b3b
+  # R7, assessment rank 3: applicability and enforcement profile, inactive by default.
+  # Nothing declared here refuses a commit, runs on a schedule, or arms.
+  profile:
+    applies: [R2-applicability-graph, R6-crosswalk, R7-policy-gates, R9-review-boundary]
+    enforcement: inactive
+    cadence: none
+    arming: none
